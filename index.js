@@ -81,6 +81,15 @@ function goBack(session) {
     }
 }
 
+// Root Endpoint
+app.get('/', (req, res) => {
+    res.status(200).send({
+        status: 'Online',
+        message: 'Vanigan WhatsApp Bot API is active and running',
+        version: '1.0.0'
+    });
+});
+
 // Basic text message
 async function sendTextMessage(to, text) {
     try {
