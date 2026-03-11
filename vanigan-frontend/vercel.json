@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "vanigan-frontend/dist",
+  "outputDirectory": "dist",
   "framework": "vite",
   "routes": [
     { "handle": "filesystem" },
