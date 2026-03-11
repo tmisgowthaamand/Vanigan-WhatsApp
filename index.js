@@ -9,12 +9,13 @@ const PORT = process.env.PORT || 3000;
 const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 const WHATSAPP_API_TOKEN = process.env.WHATSAPP_API_TOKEN;
 const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://vanigan-whats-app.vercel.app/';
 
 // User session storage (In-memory for now)
 const sessions = {};
 
 const MENUS = {
-    MAIN: `Welcome to Vanigan App\n\nDiscover Businesses, Members, and Organizers across your district.\n\nPlease choose an option below:\n\n*Main Menu Options*\n1. Business List\n2. Organizer List\n3. Members List\n4. Add Business\n5. Subscription Plans\n6. News`,
+    MAIN: `Welcome to Vanigan App\n\nDiscover Businesses, Members, and Organizers across your district.\n\nVisit our website: ${FRONTEND_URL}\n\nPlease choose an option below:\n\n*Main Menu Options*\n1. Business List\n2. Organizer List\n3. Members List\n4. Add Business\n5. Subscription Plans\n6. News`,
     
     BUSINESS_CATEGORY: `Please choose a Business Category:\n\n1. Retail\n2. Manufacturing\n3. Services\n4. Food & Restaurants\n5. Construction\n6. Education\n7. Health`,
     

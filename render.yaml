@@ -17,3 +17,5 @@ services:
         sync: false
       - key: WHATSAPP_APP_ID
         sync: false
+      - key: FRONTEND_URL
+        value: https://vanigan-whats-app.vercel.app/
