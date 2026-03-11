@@ -73,25 +73,25 @@ function App() {
     <>
       <div className="bg-gradient"></div>
 
-      <nav className="navbar" style={{ background: scrolled ? 'rgba(15, 23, 42, 0.9)' : 'transparent', borderBottomColor: scrolled ? 'rgba(255,255,255,0.1)' : 'transparent' }}>
+      <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="container nav-container">
           <div className="logo">
-            <span style={{ color: '#4F46E5' }}><Bot size={32} /></span>
+            <Bot size={32} className="logo-icon" />
             Vanigan<span className="text-gradient">App</span>
           </div>
 
-          <div className="nav-links" style={{ display: window.innerWidth > 768 ? 'flex' : 'none' }}>
+          <div className="nav-links desktop-only">
             <a href="#features">Features</a>
             <a href="#demo">How it Works</a>
             <a href="#pricing">Pricing</a>
           </div>
 
-          <div style={{ display: window.innerWidth > 768 ? 'block' : 'none' }}>
+          <div className="desktop-only">
             <button className="btn btn-primary">Connect WhatsApp</button>
           </div>
           
-          <div className="mobile-toggle" style={{ display: window.innerWidth <= 768 ? 'block' : 'none', cursor: 'pointer' }} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X size={28} color="white"/> : <Menu size={28} color="white"/>}
+          <div className="mobile-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </div>
         </div>
       </nav>
@@ -100,8 +100,8 @@ function App() {
       <section className="hero">
         <div className="container hero-grid">
           <div className="hero-content">
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', borderRadius: '99px', fontSize: '0.9rem', fontWeight: 600, marginBottom: '2rem', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-              <span style={{ width: '8px', height: '8px', background: '#10B981', borderRadius: '50%', display: 'inline-block' }}></span>
+            <div className="badge-live">
+              <span className="dot"></span>
               Live on WhatsApp Cloud API
             </div>
             <h1>The Ultimate<br /><span className="text-gradient">Business Discovery</span><br />Bot for Vanigan</h1>
@@ -158,7 +158,7 @@ function App() {
           <h2>Powerful Features Built-In</h2>
           <div className="features-grid">
             {features.map((item, i) => (
-              <div key={i} className="feature-card">
+              <div key={i} className="feature-card" style={{ animationDelay: `${i * 0.1}s` }}>
                 <div className="feature-icon">{item.icon}</div>
                 <h3>{item.title}</h3>
                 <p>{item.desc}</p>
@@ -172,27 +172,27 @@ function App() {
       <section id="pricing" className="pricing">
         <div className="container">
           <h2>Subscription Plans</h2>
-          <p style={{ textAlign: 'center', color: '#94a3b8', marginBottom: '4rem', maxWidth: '600px', margin: '0 auto 4rem' }}>
+          <p className="section-desc">
             Choose the perfect plan to grow your business presence in your district. Upgrade your visibility and access premium networking features instantly.
           </p>
           
           <div className="pricing-grid">
             {pricing.map((plan, i) => (
-              <div key={i} className={`pricing-card ${plan.popular ? 'popular' : ''}`}>
+              <div key={i} className={`pricing-card ${plan.popular ? 'popular' : ''}`} style={{ animationDelay: `${i * 0.2}s` }}>
                 {plan.popular && <div className="popular-badge">Most Popular</div>}
                 
-                <h3 style={{ color: plan.popular ? '#818cf8' : 'white' }}>{plan.title}</h3>
+                <h3 className={plan.popular ? 'text-primary' : ''}>{plan.title}</h3>
                 <div className="price">{plan.price}<span>{plan.period}</span></div>
                 
                 <ul className="pricing-features">
                   {plan.features.map((feature, j) => (
                     <li key={j}>
-                      <CheckCircle2 size={18} color="#10B981" /> {feature}
+                      <CheckCircle2 size={18} color="var(--secondary)" /> {feature}
                     </li>
                   ))}
                 </ul>
                 
-                <button className={`btn ${plan.popular ? 'btn-primary' : 'btn-outline'}`} style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
+                <button className={`btn ${plan.popular ? 'btn-primary' : 'btn-outline'} btn-full`}>
                   Subscribe via WhatsApp
                 </button>
               </div>
@@ -203,9 +203,9 @@ function App() {
 
       <footer>
         <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '1rem' }}>
-            <span style={{ color: '#4F46E5' }}><Bot size={24} /></span>
-            <span style={{ fontSize: '1.25rem', fontWeight: 800 }}>VaniganApp</span>
+          <div className="footer-logo">
+            <Bot size={24} className="logo-icon" />
+            <span className="footer-logo-text">VaniganApp</span>
           </div>
           <p>© 2026 Vanigan Network. All rights reserved.</p>
         </div>
