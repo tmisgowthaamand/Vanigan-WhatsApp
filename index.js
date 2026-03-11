@@ -81,25 +81,71 @@ function goBack(session) {
     }
 }
 
-async function sendMessage(to, text) {
+// Basic text message
+async function sendTextMessage(to, text) {
     try {
         await axios({
             method: 'POST',
             url: `https://graph.facebook.com/v18.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
-            headers: {
-                'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            data: {
-                messaging_product: 'whatsapp',
-                to: to,
-                type: 'text',
-                text: { body: text }
+            headers: { 'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`, 'Content-Type': 'application/json' },
+            data: { messaging_product: 'whatsapp', to, type: 'text', text: { body: text } }
+        });
+    } catch (error) { console.error('Error sending text message:', error.response?.data || error.message); }
+}
+
+// Media message (Image)
+async function sendImageMessage(to, imageUrl, caption) {
+    try {
+        await axios({
+            method: 'POST',
+            url: `https://graph.facebook.com/v18.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
+            headers: { 'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`, 'Content-Type': 'application/json' },
+            data: { 
+                messaging_product: 'whatsapp', to, type: 'image', 
+                image: { link: imageUrl, caption: caption } 
             }
         });
-    } catch (error) {
-        console.error('Error sending message:', error.response ? error.response.data : error.message);
-    }
+    } catch (error) { console.error('Error sending image message:', error.response?.data || error.message); }
+}
+
+// Interactive List message
+async function sendListMessage(to, title, body, buttonLabel, sections) {
+    try {
+        await axios({
+            method: 'POST',
+            url: `https://graph.facebook.com/v18.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
+            headers: { 'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`, 'Content-Type': 'application/json' },
+            data: {
+                messaging_product: 'whatsapp', to, type: 'interactive',
+                interactive: {
+                    type: 'list',
+                    header: { type: 'text', text: title },
+                    body: { text: body },
+                    footer: { text: 'Select an option to proceed' },
+                    action: { button: buttonLabel, sections: sections }
+                }
+            }
+        });
+    } catch (error) { console.error('Error sending list message:', error.response?.data || error.message); }
+}
+
+// Interactive Buttons message
+async function sendButtonsMessage(to, body, buttons) {
+    try {
+        await axios({
+            method: 'POST',
+            url: `https://graph.facebook.com/v18.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
+            headers: { 'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`, 'Content-Type': 'application/json' },
+            data: {
+                messaging_product: 'whatsapp', to, type: 'interactive',
+                interactive: {
+                    type: 'button',
+                    body: { text: body },
+                    action: { buttons: buttons.map(b => ({ type: 'reply', reply: { id: b.id, title: b.title } })) }
+                }
+            }
+        });
+    } catch (error) { console.error('Error sending buttons message:', error.response?.data || error.message); }
 }
 
 
@@ -132,44 +178,80 @@ app.post('/webhook', async (req, res) => {
             body.entry[0].changes[0].value.messages[0]) {
             
             const message = body.entry[0].changes[0].value.messages[0];
-            const userId = message.from; // Sender's phone number
+            const userId = message.from;
             
-            // Extract text or other interactive message types
             let text = '';
             if (message.type === 'text') {
                 text = message.text.body.trim();
-            } else if (message.type === 'interactive' && message.interactive.type === 'list_reply') {
-                text = message.interactive.list_reply.id;
-            } else if (message.type === 'interactive' && message.interactive.type === 'button_reply') {
-                text = message.interactive.button_reply.id;
+            } else if (message.type === 'interactive') {
+                if (message.interactive.type === 'list_reply') {
+                    text = message.interactive.list_reply.id;
+                } else if (message.interactive.type === 'button_reply') {
+                    text = message.interactive.button_reply.id;
+                }
             } else if (message.type === 'location') {
-                text = 'location_received'; // Special handling below
+                text = 'location_received';
             } else if (message.type === 'image') {
-                text = 'image_received'; // Special handling below
+                text = 'image_received';
             }
 
             if (!text) return res.sendStatus(200);
 
             const session = getSession(userId);
 
+            // Handle Reset or Global Navigation
             if (text === '9') {
                 session.state = 'MAIN';
                 session.history = [];
-                await sendMessage(userId, MENUS.MAIN);
-                return res.sendStatus(200);
-            }
-
-            if (text === '0') {
+            } else if (text === '0') {
                 goBack(session);
             }
 
             let response = '';
 
+            // ──────────────────────────────────────────────
+            // MAIN MENU HANDLER (Media + List)
+            // ──────────────────────────────────────────────
+            if (session.state === 'MAIN' && (text === '9' || text === 'Hi' || text === 'hi' || text === 'Hello' || text === '0' || !session.history.length)) {
+                const bannerUrl = 'https://raw.githubusercontent.com/tmisgowthaamand/Vanigan-WhatsApp/main/vanigan-frontend/public/banner.png'; 
+                await sendImageMessage(userId, bannerUrl, `Welcome to Vanigan App! 🚀`);
+                
+                await sendListMessage(userId, 'Main Menu', 'Discover businesses and events in your district.', 'Explore', [
+                    {
+                        title: 'Networking',
+                        rows: [
+                            { id: '1', title: 'Business List', description: 'Find shops & services' },
+                            { id: '2', title: 'Organizer List', description: 'Connect with leads' },
+                            { id: '3', title: 'Members List', description: 'View community' }
+                        ]
+                    },
+                    {
+                        title: 'Actions',
+                        rows: [
+                            { id: '4', title: 'Add Business', description: 'Register your shop' },
+                            { id: '5', title: 'Subscriptions', description: 'Premium plans' },
+                            { id: '6', title: 'News', description: 'Latest updates' }
+                        ]
+                    }
+                ]);
+                return res.sendStatus(200);
+            }
+
+            // ──────────────────────────────────────────────
+            // STATE MACHINE
+            // ──────────────────────────────────────────────
             switch (session.state) {
                 case 'MAIN':
                     if (text === '1') {
                         updateState(session, 'BUSINESS_CATEGORY');
-                        response = MENUS.BUSINESS_CATEGORY + COMMON_NAV;
+                        await sendListMessage(userId, 'Categories', 'Choose a category:', 'Select', [{
+                            title: 'Industries',
+                            rows: [
+                                { id: 'retail', title: 'Retail' }, { id: 'mfg', title: 'Manufacturing' },
+                                { id: 'svc', title: 'Services' }, { id: 'food', title: 'Food & Restaurants' }
+                            ]
+                        }]);
+                        return res.sendStatus(200);
                     } else if (text === '2') {
                         updateState(session, 'ORG_DISTRICT');
                         response = MENUS.DISTRICT + COMMON_NAV;
@@ -185,267 +267,46 @@ app.post('/webhook', async (req, res) => {
                     } else if (text === '6') {
                         updateState(session, 'NEWS_DISTRICT');
                         response = MENUS.DISTRICT + COMMON_NAV;
-                    } else if (text !== '0' && text !== '9') {
-                        // Start of interaction or invalid input on main menu
-                        session.state = 'MAIN';
-                        session.history = [];
-                        response = MENUS.MAIN; // Initial menu without back option usually
                     }
                     break;
-    
+
                 case 'BUSINESS_CATEGORY':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 7) {
-                        updateState(session, 'BUSINESS_SUB_CATEGORY');
-                        response = MENUS.BUSINESS_SUB_CATEGORY + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.BUSINESS_CATEGORY + COMMON_NAV;
-                    }
+                    updateState(session, 'BUSINESS_SUB_CATEGORY');
+                    response = MENUS.BUSINESS_SUB_CATEGORY + COMMON_NAV;
                     break;
-    
-                case 'BUSINESS_SUB_CATEGORY':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'BUSINESS_LIST');
-                        response = MENUS.BUSINESS_LIST + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.BUSINESS_SUB_CATEGORY + COMMON_NAV;
-                    }
-                    break;
-    
-                case 'BUSINESS_LIST':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'BUSINESS_DETAILS');
-                        response = MENUS.BUSINESS_DETAILS + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.BUSINESS_LIST + COMMON_NAV;
-                    }
-                    break;
-    
-                case 'BUSINESS_DETAILS':
-                    if (text === '1' || text === '2' || text === '3') {
-                        if (text === '3') {
-                             goBack(session);
-                             // After going back perfectly handle the render, we will handle that at the end
-                        } else {
-                             // Mock action
-                             response = (text === '1' ? "Redirecting to call..." : "Opening map...") + COMMON_NAV;
-                        }
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.BUSINESS_DETAILS + COMMON_NAV;
-                    }
-                    break;
-    
-                // ORGANIZER
-                case 'ORG_DISTRICT':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'ORG_ASSEMBLY');
-                        response = MENUS.ASSEMBLY + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.DISTRICT + COMMON_NAV;
-                    }
-                    break;
-                case 'ORG_ASSEMBLY':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'ORGANIZER_LIST');
-                        response = MENUS.ORGANIZER_LIST + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.ASSEMBLY + COMMON_NAV;
-                    }
-                    break;
-                case 'ORGANIZER_LIST':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 3) {
-                        updateState(session, 'ORGANIZER_DETAILS');
-                        response = MENUS.ORGANIZER_DETAILS + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.ORGANIZER_LIST + COMMON_NAV;
-                    }
-                    break;
-                case 'ORGANIZER_DETAILS':
-                    if(text !== '0'){
-                         response = "*Invalid input.*\n\n" + MENUS.ORGANIZER_DETAILS + COMMON_NAV;
-                    }
-                    break;
-    
-                // MEMBERS
-                case 'MEMBERS_DISTRICT':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'MEMBERS_ASSEMBLY');
-                        response = MENUS.ASSEMBLY + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.DISTRICT + COMMON_NAV;
-                    }
-                    break;
-                case 'MEMBERS_ASSEMBLY':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'MEMBER_LIST');
-                        response = MENUS.MEMBER_LIST + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.ASSEMBLY + COMMON_NAV;
-                    }
-                    break;
-                case 'MEMBER_LIST':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 2) {
-                        updateState(session, 'MEMBER_DETAILS');
-                        response = MENUS.MEMBER_DETAILS + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.MEMBER_LIST + COMMON_NAV;
-                    }
-                    break;
-                case 'MEMBER_DETAILS':
-                    if(text !== '0'){
-                         response = "*Invalid input.*\n\n" + MENUS.MEMBER_DETAILS + COMMON_NAV;
-                    }
-                    break;
-    
-                // ADD BUSINESS
-                case 'ADD_BUSINESS_NAME':
-                    if (text !== '0') {
-                        updateState(session, 'ADD_BUSINESS_OWNER');
-                        response = MENUS.ADD_BUSINESS_OWNER + COMMON_NAV;
-                    }
-                    break;
-                case 'ADD_BUSINESS_OWNER':
-                    if (text !== '0') {
-                        updateState(session, 'ADD_BUSINESS_PHONE');
-                        response = MENUS.ADD_BUSINESS_PHONE + COMMON_NAV;
-                    }
-                    break;
-                case 'ADD_BUSINESS_PHONE':
-                    if (text !== '0') {
-                        updateState(session, 'ADD_BUSINESS_CATEGORY');
-                        response = MENUS.ADD_BUSINESS_CATEGORY + COMMON_NAV;
-                    }
-                    break;
-                case 'ADD_BUSINESS_CATEGORY':
-                    if (text !== '0') {
-                        updateState(session, 'ADD_BUSINESS_DESC');
-                        response = MENUS.ADD_BUSINESS_DESC + COMMON_NAV;
-                    }
-                    break;
-                case 'ADD_BUSINESS_DESC':
-                    if (text !== '0') {
-                        updateState(session, 'ADD_BUSINESS_PHOTO');
-                        response = MENUS.ADD_BUSINESS_PHOTO + COMMON_NAV;
-                    }
-                    break;
-                case 'ADD_BUSINESS_PHOTO':
-                    if (text !== '0' || text === 'image_received') {
-                        updateState(session, 'ADD_BUSINESS_LOCATION');
-                        response = MENUS.ADD_BUSINESS_LOCATION + COMMON_NAV;
-                    }
-                    break;
-                case 'ADD_BUSINESS_LOCATION':
-                    if (text !== '0' || text === 'location_received') {
-                        updateState(session, 'ADD_BUSINESS_CONFIRM');
-                        session.history = []; // Reset after submission
-                        session.state = 'MAIN'; // Go back to main
-                        response = MENUS.ADD_BUSINESS_CONFIRM + "\n\n" + MENUS.MAIN;
-                    }
-                    break;
-    
-                // SUBSCRIPTIONS
-                case 'SUBSCRIPTION':
-                    if (text === '1') {
-                        updateState(session, 'SUB_MONTHLY');
-                        response = MENUS.SUB_MONTHLY + COMMON_NAV;
-                    } else if (text === '2') {
-                        updateState(session, 'SUB_YEARLY');
-                        response = MENUS.SUB_YEARLY + COMMON_NAV;
-                    } else if (text === '3') {
-                        updateState(session, 'SUB_LIFETIME');
-                        response = MENUS.SUB_LIFETIME + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.SUBSCRIPTION + COMMON_NAV;
-                    }
-                    break;
-                case 'SUB_MONTHLY':
-                case 'SUB_YEARLY':
-                case 'SUB_LIFETIME':
-                    if (text === '1') {
-                        response = "Redirecting to payment..." + COMMON_NAV;
-                    } else if (text === '2') {
-                        goBack(session);
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + (session.state === 'SUB_MONTHLY' ? MENUS.SUB_MONTHLY : session.state === 'SUB_YEARLY' ? MENUS.SUB_YEARLY : MENUS.SUB_LIFETIME) + COMMON_NAV;
-                    }
-                    break;
-    
-                // NEWS
-                case 'NEWS_DISTRICT':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'NEWS_ASSEMBLY');
-                        response = MENUS.ASSEMBLY + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.DISTRICT + COMMON_NAV;
-                    }
-                    break;
-                case 'NEWS_ASSEMBLY':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 4) {
-                        updateState(session, 'NEWS_LIST');
-                        response = MENUS.NEWS_LIST + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.ASSEMBLY + COMMON_NAV;
-                    }
-                    break;
-                case 'NEWS_LIST':
-                    if (parseInt(text) >= 1 && parseInt(text) <= 3) {
-                        updateState(session, 'NEWS_DETAILS');
-                        response = MENUS.NEWS_DETAILS + COMMON_NAV;
-                    } else if (text !== '0') {
-                        response = "*Invalid input.*\n\n" + MENUS.NEWS_LIST + COMMON_NAV;
-                    }
-                    break;
-                case 'NEWS_DETAILS':
-                    if(text !== '0'){
-                         response = "*Invalid input.*\n\n" + MENUS.NEWS_DETAILS + COMMON_NAV;
-                    }
-                    break;
-            }
-
-            // If they pressed '0' or '2' (in some cases) to go back, render the target state correctly.
-            if (text === '0' || (response === '' && text === '2' && session.state.startsWith('SUB_'))) {
-                let menuString = '';
                 
-                // Re-map state to its menu literal
-                const mapStateToMenu = {
-                    'MAIN': MENUS.MAIN,
-                    'BUSINESS_CATEGORY': MENUS.BUSINESS_CATEGORY,
-                    'BUSINESS_SUB_CATEGORY': MENUS.BUSINESS_SUB_CATEGORY,
-                    'BUSINESS_LIST': MENUS.BUSINESS_LIST,
-                    'BUSINESS_DETAILS': MENUS.BUSINESS_DETAILS,
-                    'ORG_DISTRICT': MENUS.DISTRICT,
-                    'ORG_ASSEMBLY': MENUS.ASSEMBLY,
-                    'ORGANIZER_LIST': MENUS.ORGANIZER_LIST,
-                    'ORGANIZER_DETAILS': MENUS.ORGANIZER_DETAILS,
-                    'MEMBERS_DISTRICT': MENUS.DISTRICT,
-                    'MEMBERS_ASSEMBLY': MENUS.ASSEMBLY,
-                    'MEMBER_LIST': MENUS.MEMBER_LIST,
-                    'MEMBER_DETAILS': MENUS.MEMBER_DETAILS,
-                    'ADD_BUSINESS_NAME': MENUS.ADD_BUSINESS_NAME,
-                    'ADD_BUSINESS_OWNER': MENUS.ADD_BUSINESS_OWNER,
-                    'ADD_BUSINESS_PHONE': MENUS.ADD_BUSINESS_PHONE,
-                    'ADD_BUSINESS_CATEGORY': MENUS.ADD_BUSINESS_CATEGORY,
-                    'ADD_BUSINESS_DESC': MENUS.ADD_BUSINESS_DESC,
-                    'ADD_BUSINESS_PHOTO': MENUS.ADD_BUSINESS_PHOTO,
-                    'ADD_BUSINESS_LOCATION': MENUS.ADD_BUSINESS_LOCATION,
-                    'SUBSCRIPTION': MENUS.SUBSCRIPTION,
-                    'SUB_MONTHLY': MENUS.SUB_MONTHLY,
-                    'SUB_YEARLY': MENUS.SUB_YEARLY,
-                    'SUB_LIFETIME': MENUS.SUB_LIFETIME,
-                    'NEWS_DISTRICT': MENUS.DISTRICT,
-                    'NEWS_ASSEMBLY': MENUS.ASSEMBLY,
-                    'NEWS_LIST': MENUS.NEWS_LIST,
-                    'NEWS_DETAILS': MENUS.NEWS_DETAILS
-                };
+                case 'BUSINESS_SUB_CATEGORY':
+                    updateState(session, 'BUSINESS_LIST');
+                    response = MENUS.BUSINESS_LIST + COMMON_NAV;
+                    break;
 
-                menuString = mapStateToMenu[session.state] || MENUS.MAIN;
-                response = session.state === 'MAIN' ? menuString : menuString + COMMON_NAV;
+                case 'BUSINESS_LIST':
+                    updateState(session, 'BUSINESS_DETAILS');
+                    await sendButtonsMessage(userId, MENUS.BUSINESS_DETAILS, [
+                        { id: 'call', title: 'Call' },
+                        { id: 'map', title: 'Location' },
+                        { id: '0', title: 'Back' }
+                    ]);
+                    return res.sendStatus(200);
+
+                case 'BUSINESS_DETAILS':
+                    if (text === 'call') response = "Calling business...";
+                    else if (text === 'map') response = "Opening location...";
+                    break;
+
+                // Simple fallbacks for other states (can be upgraded later)
+                default:
+                    response = "Checking your request..." + COMMON_NAV;
             }
 
             if (response) {
-                await sendMessage(userId, response);
+                await sendTextMessage(userId, response);
             }
         }
-        res.sendStatus(200);
+        // If no specific return res.sendStatus(200) was hit, and no response was sent,
+        // or if a response was sent via sendTextMessage, we still need to acknowledge the webhook.
+        // This ensures the webhook is always acknowledged if body.object is present.
+        res.sendStatus(200); 
     } else {
         res.sendStatus(404);
     }
