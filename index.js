@@ -223,23 +223,25 @@ app.post('/webhook', async (req, res) => {
             // ──────────────────────────────────────────────
             if (session.state === 'MAIN' && (text === '9' || text === 'Hi' || text === 'hi' || text === 'Hello' || text === '0' || !session.history.length)) {
                 const bannerUrl = 'https://raw.githubusercontent.com/tmisgowthaamand/Vanigan-WhatsApp/main/vanigan-frontend/public/banner.png'; 
-                await sendImageMessage(userId, bannerUrl, `Welcome to Vanigan App! 🚀`);
+                const introMessage = `*Welcome to Vanigan App!* 🚀\n\nConnect, Network, and Grow your professional community in your district.\n\n🌐 *Visit our Website for more details:*\n${FRONTEND_URL}\n\n*Features at your fingertips:* ✨\n• Business Directory\n• Organizer Search\n• Member Networking\n• Real-time News Updates\n\n👇 *Ready to start? Select an option below:*`;
                 
-                await sendListMessage(userId, 'Main Menu', 'Discover businesses and events in your district.', 'Explore', [
+                await sendImageMessage(userId, bannerUrl, introMessage);
+                
+                await sendListMessage(userId, 'Vanigan Main Menu', 'Select a service to proceed:', 'Open Options', [
                     {
-                        title: 'Networking',
+                        title: 'Networking & Search',
                         rows: [
-                            { id: '1', title: 'Business List', description: 'Find shops & services' },
-                            { id: '2', title: 'Organizer List', description: 'Connect with leads' },
-                            { id: '3', title: 'Members List', description: 'View community' }
+                            { id: '1', title: 'Business List', description: 'Find local shops & factories' },
+                            { id: '2', title: 'Organizer List', description: 'Connect with district leads' },
+                            { id: '3', title: 'Members List', description: 'Browse community members' }
                         ]
                     },
                     {
-                        title: 'Actions',
+                        title: 'Manage Your Presence',
                         rows: [
-                            { id: '4', title: 'Add Business', description: 'Register your shop' },
-                            { id: '5', title: 'Subscriptions', description: 'Premium plans' },
-                            { id: '6', title: 'News', description: 'Latest updates' }
+                            { id: '4', title: 'Add Business', description: 'Register your shop on Vanigan' },
+                            { id: '5', title: 'Subscriptions', description: 'View professional plans' },
+                            { id: '6', title: 'District News', description: 'Stay updated on local events' }
                         ]
                     }
                 ]);
