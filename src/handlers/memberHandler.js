@@ -13,7 +13,11 @@ async function handleMember(user, text, lang) {
       const idx = parseInt(text) - 1;
 
       if (isNaN(text) || idx < 0 || idx >= districts.length) {
-        await wa.sendText(num, t.invalidInput + t.backToMenu);
+        await wa.sendText(num, t.invalidInput);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         return;
       }
 
@@ -26,9 +30,13 @@ async function handleMember(user, text, lang) {
       selected.assemblies.forEach((a, i) => {
         msg += `${i + 1}. ${a.name}\n`;
       });
-      msg += t.backToMenu;
+      msg += `\n0. Back`;
 
       await wa.sendText(num, msg);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'member_assembly', 'select_district', text, { district: selected.name });
       break;
     }
@@ -42,7 +50,11 @@ async function handleMember(user, text, lang) {
 
       const idx = parseInt(text) - 1;
       if (isNaN(text) || idx < 0 || idx >= district.assemblies.length) {
-        await wa.sendText(num, t.invalidInput + t.backToMenu);
+        await wa.sendText(num, t.invalidInput);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         return;
       }
 
@@ -57,7 +69,11 @@ async function handleMember(user, text, lang) {
       }).lean();
 
       if (members.length === 0) {
-        await wa.sendText(num, t.noResults + t.backToMenu);
+        await wa.sendText(num, t.noResults);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         return;
       }
 
@@ -68,9 +84,13 @@ async function handleMember(user, text, lang) {
       members.forEach((m, i) => {
         msg += `${i + 1}. *${m.name}*\n   ${m.position || m.businessName || 'Member'} | ${m.contact || 'N/A'}\n\n`;
       });
-      msg += t.backToMenu;
+      msg += `\n0. Back`;
 
       await wa.sendText(num, msg);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'member_list', 'view_list', text, {
         district: user.tempData.selectedDistrict,
         assembly: selectedAssembly
@@ -93,16 +113,23 @@ async function handleMember(user, text, lang) {
         msg += `District: ${mem.district}\n`;
         msg += `Assembly: ${mem.assembly}\n`;
         msg += `Contact: ${mem.contact || 'N/A'}\n`;
-        msg += t.backToMenu;
 
         if (mem.photoUrl) {
           await wa.sendImage(num, mem.photoUrl, msg);
         } else {
           await wa.sendText(num, msg);
         }
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         await trackAction(num, 'member_list', 'view_detail', text, { member: mem.name });
       } else {
-        await wa.sendText(num, t.invalidInput + t.backToMenu);
+        await wa.sendText(num, t.invalidInput);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
       }
       break;
     }
@@ -120,9 +147,13 @@ async function startMemberFlow(user, lang) {
   districts.forEach((d, i) => {
     msg += `${i + 1}. ${d.name}\n`;
   });
-  msg += lang.backToMenu;
+  msg += `\n0. Back`;
 
   await wa.sendText(user.whatsappNumber, msg);
+  await wa.sendButtons(user.whatsappNumber, 'Navigate:', [
+    { id: '0', title: 'Back' },
+    { id: '9', title: 'Main Menu' }
+  ]);
   await trackAction(user.whatsappNumber, 'member_district', 'started', '', {});
 }
 

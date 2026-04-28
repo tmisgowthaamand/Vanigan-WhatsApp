@@ -19,7 +19,11 @@ async function handleAddBusiness(user, text, lang, message) {
       user.tempData.businessName = text;
       user.currentState = 'add_business_address';
       await user.save();
-      await wa.sendText(num, t.addBusinessAddress + t.backToMenu);
+      await wa.sendText(num, t.addBusinessAddress);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'add_business_address', 'enter_name', text, { businessName: text });
       break;
     }
@@ -38,8 +42,12 @@ async function handleAddBusiness(user, text, lang, message) {
       districts.forEach((d, i) => {
         msg += `${i + 1}. ${d.name}\n`;
       });
-      msg += t.backToMenu;
+      msg += `\n0. Back`;
       await wa.sendText(num, msg);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'add_business_district', 'enter_address', text, {});
       break;
     }
@@ -49,7 +57,11 @@ async function handleAddBusiness(user, text, lang, message) {
       const idx = parseInt(text) - 1;
 
       if (isNaN(text) || idx < 0 || idx >= districts.length) {
-        await wa.sendText(num, t.invalidInput + t.backToMenu);
+        await wa.sendText(num, t.invalidInput);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         return;
       }
 
@@ -62,8 +74,12 @@ async function handleAddBusiness(user, text, lang, message) {
       selected.assemblies.forEach((a, i) => {
         msg += `${i + 1}. ${a.name}\n`;
       });
-      msg += t.backToMenu;
+      msg += `\n0. Back`;
       await wa.sendText(num, msg);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'add_business_assembly', 'select_district', text, { district: selected.name });
       break;
     }
@@ -77,14 +93,22 @@ async function handleAddBusiness(user, text, lang, message) {
 
       const idx = parseInt(text) - 1;
       if (isNaN(text) || idx < 0 || idx >= district.assemblies.length) {
-        await wa.sendText(num, t.invalidInput + t.backToMenu);
+        await wa.sendText(num, t.invalidInput);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         return;
       }
 
       user.tempData.assembly = district.assemblies[idx].name;
       user.currentState = 'add_business_contact';
       await user.save();
-      await wa.sendText(num, t.addBusinessContact + t.backToMenu);
+      await wa.sendText(num, t.addBusinessContact);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'add_business_contact', 'select_assembly', text, { assembly: user.tempData.assembly });
       break;
     }
@@ -98,7 +122,11 @@ async function handleAddBusiness(user, text, lang, message) {
       user.tempData.contact = cleaned;
       user.currentState = 'add_business_photo';
       await user.save();
-      await wa.sendText(num, t.addBusinessPhoto + t.backToMenu);
+      await wa.sendText(num, t.addBusinessPhoto);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'add_business_photo', 'enter_contact', cleaned, {});
       break;
     }
@@ -174,7 +202,11 @@ async function startAddBusinessFlow(user, lang) {
   user.selectedService = 'add_business';
   await user.save();
 
-  await wa.sendText(user.whatsappNumber, lang.addBusinessName + lang.backToMenu);
+  await wa.sendText(user.whatsappNumber, lang.addBusinessName);
+  await wa.sendButtons(user.whatsappNumber, 'Navigate:', [
+    { id: '0', title: 'Back' },
+    { id: '9', title: 'Main Menu' }
+  ]);
   await trackAction(user.whatsappNumber, 'add_business_name', 'started', '', {});
 }
 

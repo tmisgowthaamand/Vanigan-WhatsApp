@@ -50,7 +50,11 @@ async function handleSubscription(user, text, lang) {
     }
 
     case 'waiting_for_payment': {
-      await wa.sendText(num, t.waitingPayment + t.backToMenu);
+      await wa.sendText(num, t.waitingPayment);
+      await wa.sendButtons(num, 'Navigate:', [
+        { id: '0', title: 'Back' },
+        { id: '9', title: 'Main Menu' }
+      ]);
       await trackAction(num, 'waiting_for_payment', 'user_message_while_waiting', text, {});
       break;
     }
@@ -63,7 +67,11 @@ async function startSubscriptionFlow(user, lang) {
   user.selectedService = 'subscription';
   await user.save();
 
-  await wa.sendText(user.whatsappNumber, lang.subscriptionPlans + lang.backToMenu);
+  await wa.sendText(user.whatsappNumber, lang.subscriptionPlans);
+  await wa.sendButtons(user.whatsappNumber, 'Navigate:', [
+    { id: '0', title: 'Back' },
+    { id: '9', title: 'Main Menu' }
+  ]);
   await trackAction(user.whatsappNumber, 'subscription_plans', 'started', '', {});
 }
 

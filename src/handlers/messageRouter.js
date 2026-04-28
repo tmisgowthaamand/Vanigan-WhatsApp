@@ -192,6 +192,13 @@ async function reEnterState(user, lang) {
   const state = user.currentState;
   const num = user.whatsappNumber;
 
+  const sendNavButtons = async (to) => {
+    await wa.sendButtons(to, 'Navigate:', [
+      { id: '0', title: 'Back' },
+      { id: '9', title: 'Main Menu' }
+    ]);
+  };
+
   if (state === 'business_list') {
     await handleBusinessList(user, '1', lang);
   } else if (state === 'organizer_district') {
@@ -203,8 +210,9 @@ async function reEnterState(user, lang) {
     if (district) {
       let msg = lang.selectAssembly;
       district.assemblies.forEach((a, i) => { msg += `${i + 1}. ${a.name}\n`; });
-      msg += lang.backToMenu;
+      msg += `\n0. Back`;
       await wa.sendText(num, msg);
+      await sendNavButtons(num);
     }
   } else if (state === 'member_district') {
     await startMemberFlow(user, lang);
@@ -214,35 +222,43 @@ async function reEnterState(user, lang) {
     if (district) {
       let msg = lang.selectAssembly;
       district.assemblies.forEach((a, i) => { msg += `${i + 1}. ${a.name}\n`; });
-      msg += lang.backToMenu;
+      msg += `\n0. Back`;
       await wa.sendText(num, msg);
+      await sendNavButtons(num);
     }
   } else if (state === 'add_business_name') {
-    await wa.sendText(num, lang.addBusinessName + lang.backToMenu);
+    await wa.sendText(num, lang.addBusinessName);
+    await sendNavButtons(num);
   } else if (state === 'add_business_address') {
-    await wa.sendText(num, lang.addBusinessAddress + lang.backToMenu);
+    await wa.sendText(num, lang.addBusinessAddress);
+    await sendNavButtons(num);
   } else if (state === 'add_business_district') {
     const District = require('../models/District');
     const districts = await District.find().sort({ name: 1 }).lean();
     let msg = lang.addBusinessDistrict;
     districts.forEach((d, i) => { msg += `${i + 1}. ${d.name}\n`; });
-    msg += lang.backToMenu;
+    msg += `\n0. Back`;
     await wa.sendText(num, msg);
+    await sendNavButtons(num);
   } else if (state === 'add_business_assembly') {
     const District = require('../models/District');
     const district = await District.findOne({ name: user.tempData.district }).lean();
     if (district) {
       let msg = lang.addBusinessAssembly;
       district.assemblies.forEach((a, i) => { msg += `${i + 1}. ${a.name}\n`; });
-      msg += lang.backToMenu;
+      msg += `\n0. Back`;
       await wa.sendText(num, msg);
+      await sendNavButtons(num);
     }
   } else if (state === 'add_business_contact') {
-    await wa.sendText(num, lang.addBusinessContact + lang.backToMenu);
+    await wa.sendText(num, lang.addBusinessContact);
+    await sendNavButtons(num);
   } else if (state === 'add_business_photo') {
-    await wa.sendText(num, lang.addBusinessPhoto + lang.backToMenu);
+    await wa.sendText(num, lang.addBusinessPhoto);
+    await sendNavButtons(num);
   } else if (state === 'subscription_plans') {
-    await wa.sendText(num, lang.subscriptionPlans + lang.backToMenu);
+    await wa.sendText(num, lang.subscriptionPlans);
+    await sendNavButtons(num);
   } else {
     await sendMainMenu(user, lang);
   }

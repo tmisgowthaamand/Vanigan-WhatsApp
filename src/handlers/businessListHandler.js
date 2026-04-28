@@ -50,7 +50,11 @@ async function handleBusinessList(user, text, lang) {
         .lean();
 
       if (businesses.length === 0) {
-        await wa.sendText(num, t.noResults + t.backToMenu);
+        await wa.sendText(num, t.noResults);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         return;
       }
 
@@ -133,7 +137,11 @@ async function startBusinessListFlow(user, lang) {
   const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
 
   if (businesses.length === 0) {
-    await wa.sendText(user.whatsappNumber, lang.noResults + lang.backToMenu);
+    await wa.sendText(user.whatsappNumber, lang.noResults);
+    await wa.sendButtons(user.whatsappNumber, 'Navigate:', [
+      { id: '0', title: 'Back' },
+      { id: '9', title: 'Main Menu' }
+    ]);
     return;
   }
 
