@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Users, Building2, Target, CreditCard, UserCog, Briefcase, Clock, TrendingUp } from 'lucide-react';
-
-const API = '/api/admin';
+import { API } from '../config';
 
 const card = {
   background: '#1e293b', borderRadius: 12, padding: '24px', border: '1px solid #334155',
