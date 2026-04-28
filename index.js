@@ -134,9 +134,10 @@ async function start() {
   try {
     await connectDB();
     app.listen(PORT, () => {
+      const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
       console.log(`Vanigan Bot Server running on port ${PORT}`);
-      console.log(`Admin API: http://localhost:${PORT}/api/admin/dashboard`);
-      console.log(`Webhook: http://localhost:${PORT}/webhook`);
+      console.log(`Admin API: ${baseUrl}/api/admin/dashboard`);
+      console.log(`Webhook: ${baseUrl}/webhook`);
     });
   } catch (err) {
     console.error('Failed to start server:', err);
