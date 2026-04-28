@@ -1,10 +1,12 @@
 {
   "name": "vanigan-whatsapp-bot",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Vanigan WhatsApp Business Automation Bot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "seed": "node src/data/seed.js",
     "build": "npm install --prefix vanigan-frontend && npm run build --prefix vanigan-frontend"
   },
   "keywords": [],
@@ -13,7 +15,11 @@
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.13.6",
+    "cors": "^2.8.5",
     "dotenv": "^17.3.1",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^8.14.1",
+    "multer": "^1.4.5-lts.2",
+    "razorpay": "^2.9.5"
   }
 }
