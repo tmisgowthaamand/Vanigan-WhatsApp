@@ -1,5 +1,6 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const Payment = require('../models/Payment');
 
 let razorpayInstance = null;
 
@@ -41,6 +42,21 @@ async function createPaymentLink(plan, whatsappNumber, userId) {
       userId: userId
     }
   });
+
+  // Save initial pending payment record
+  try {
+    await Payment.create({
+      whatsappNumber,
+      userId: userId,
+      plan: plan,
+      amount: planInfo.amount / 100,
+      currency: 'INR',
+      razorpayOrderId: paymentLink.id,
+      status: 'created'
+    });
+  } catch (err) {
+    console.error('Failed to create pending payment record:', err.message);
+  }
 
   return {
     paymentLinkId: paymentLink.id,

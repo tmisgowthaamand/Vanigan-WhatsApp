@@ -61,17 +61,20 @@ router.post('/webhook', async (req, res) => {
         user.tempData = {};
         await user.save();
 
-        // Save payment record
-        await Payment.create({
-          whatsappNumber,
-          userId: user._id,
-          plan,
-          amount: paymentEntity.amount / 100,
-          currency: paymentEntity.currency,
-          razorpayOrderId: paymentLinkEntity.id,
-          razorpayPaymentId: paymentEntity.id,
-          status: 'paid'
-        });
+        // Update payment record
+        await Payment.findOneAndUpdate(
+          { razorpayOrderId: paymentLinkEntity.id },
+          {
+            whatsappNumber,
+            userId: user._id,
+            plan,
+            amount: paymentEntity.amount / 100,
+            currency: paymentEntity.currency,
+            razorpayPaymentId: paymentEntity.id,
+            status: 'paid'
+          },
+          { upsert: true }
+        );
 
         // Send success message via WhatsApp
         const lang = user.language === 'ta' ? ta : en;
@@ -101,6 +104,12 @@ router.post('/webhook', async (req, res) => {
           await wa.sendText(whatsappNumber, lang.paymentFailed);
           await trackAction(whatsappNumber, 'choose_service', 'payment_failed', '', {});
         }
+        
+        // Update payment record to failed
+        const orderId = payload.payment_link ? payload.payment_link.entity.id : paymentEntity.order_id;
+        if (orderId) {
+          await Payment.findOneAndUpdate({ razorpayOrderId: orderId }, { status: 'failed' });
+        }
       }
     }
 
@@ -113,11 +122,18 @@ router.post('/webhook', async (req, res) => {
 
 // Razorpay callback (redirect after payment)
 router.get('/callback', async (req, res) => {
-  const { razorpay_payment_link_id, razorpay_payment_link_status } = req.query;
+  const { razorpay_payment_link_status } = req.query;
+  
+  // The bot's phone number without + or spaces
+  const botNumber = process.env.BOT_PHONE_NUMBER || '15551596475';
+  
   if (razorpay_payment_link_status === 'paid') {
-    return res.send('<html><body><h2>Payment Successful! You can close this window and check WhatsApp.</h2></body></html>');
+    const text = encodeURIComponent('Paid successfully');
+    return res.redirect(`https://wa.me/${botNumber}?text=${text}`);
   }
-  return res.send('<html><body><h2>Payment status: ' + (razorpay_payment_link_status || 'unknown') + '</h2></body></html>');
+  
+  const text = encodeURIComponent(`Payment status: ${razorpay_payment_link_status || 'unknown'}`);
+  return res.redirect(`https://wa.me/${botNumber}?text=${text}`);
 });
 
 module.exports = router;

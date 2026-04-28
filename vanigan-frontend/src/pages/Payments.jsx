@@ -69,7 +69,7 @@ export default function Payments() {
                 <td style={{ ...td, fontWeight: 500 }}>{p.whatsappNumber}</td>
                 <td style={td}><span style={{ background: '#8b5cf620', color: '#8b5cf6', padding: '2px 10px', borderRadius: 20, fontSize: '0.75rem', textTransform: 'capitalize' }}>{p.plan}</span></td>
                 <td style={td}>{p.currency} {p.amount}</td>
-                <td style={td}><span style={statusBadge(p.status)}>{p.status}</span></td>
+                <td style={td}><span style={statusBadge(p.status)}>{p.status === 'created' ? 'Pending' : p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></td>
                 <td style={{ ...td, fontSize: '0.8rem', color: '#64748b' }}>{p.razorpayPaymentId || p.razorpayOrderId || '-'}</td>
                 <td style={td}>{new Date(p.createdAt).toLocaleString('en-IN')}</td>
                 <td style={td}>
