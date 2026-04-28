@@ -8,7 +8,7 @@ module.exports = {
   organizerListTitle: `*{district} - {assembly} அமைப்பாளர்கள்*\n\n`,
   memberListTitle: `*{district} - {assembly} உறுப்பினர்கள்*\n\n`,
   noResults: `முடிவுகள் எதுவும் இல்லை. வேறு தேர்வை முயற்சிக்கவும்.`,
-  backToMenu: `\n\n0. பின்செல்\n9. முடி`,
+  backToMenu: `\n\n0. பின்செல்\n9. முதன்மை பட்டியல்`,
 
   addBusinessName: `உங்கள் *வணிக பெயரை* உள்ளிடுங்கள்:`,
   addBusinessAddress: `*முழு முகவரியை* உள்ளிடுங்கள் (அஞ்சல் குறியீடு/அடையாளம்):`,
