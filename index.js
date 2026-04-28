@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const connectDB = require('./src/config/db');
 const Business = require('./src/models/Business');
+const District = require('./src/models/District');
 const wa = require('./src/services/whatsapp');
 
 const webhookRoutes = require('./src/routes/webhook');
@@ -35,6 +36,16 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/webhook', webhookRoutes);
 app.use('/razorpay', razorpayRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Fetch Districts and Assemblies
+app.get('/api/districts', async (req, res) => {
+  try {
+    const districts = await District.find().sort({ name: 1 }).lean();
+    res.json({ success: true, data: districts });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Web Form Submission
 app.post('/api/business/submit-form', async (req, res) => {

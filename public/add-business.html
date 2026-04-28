@@ -32,10 +32,14 @@
       <input type="text" id="address" name="address" placeholder="E.g., 45, Main Road..." required>
       
       <label>District</label>
-      <input type="text" id="district" name="district" placeholder="E.g., Chennai" required>
+      <select id="district" name="district" required>
+        <option value="">Select District</option>
+      </select>
       
       <label>Assembly Constituency</label>
-      <input type="text" id="assembly" name="assembly" placeholder="E.g., T. Nagar" required>
+      <select id="assembly" name="assembly" required disabled>
+        <option value="">Select Assembly</option>
+      </select>
       
       <label>Contact Number</label>
       <input type="text" id="contact" name="contact" placeholder="E.g., 9876543210" required>
@@ -61,6 +65,51 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     document.getElementById('whatsappNumber').value = urlParams.get('phone') || '';
+
+    let districtsData = [];
+
+    async function loadDistricts() {
+      try {
+        const res = await fetch('/api/districts');
+        const json = await res.json();
+        if (json.success) {
+          districtsData = json.data;
+          const distSelect = document.getElementById('district');
+          districtsData.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.name;
+            opt.textContent = d.name;
+            distSelect.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load districts', e);
+      }
+    }
+
+    document.getElementById('district').addEventListener('change', (e) => {
+      const selectedDist = e.target.value;
+      const asmSelect = document.getElementById('assembly');
+      asmSelect.innerHTML = '<option value="">Select Assembly</option>';
+      
+      if (!selectedDist) {
+        asmSelect.disabled = true;
+        return;
+      }
+      
+      const distData = districtsData.find(d => d.name === selectedDist);
+      if (distData && distData.assemblies) {
+        distData.assemblies.forEach(a => {
+          const opt = document.createElement('option');
+          opt.value = a.name;
+          opt.textContent = a.name;
+          asmSelect.appendChild(opt);
+        });
+        asmSelect.disabled = false;
+      }
+    });
+
+    loadDistricts();
 
     document.getElementById('bizForm').addEventListener('submit', async (e) => {
       e.preventDefault();
