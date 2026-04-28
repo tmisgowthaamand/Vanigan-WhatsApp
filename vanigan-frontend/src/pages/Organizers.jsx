@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -13,10 +13,21 @@ export default function Organizers() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
+  const fetchOrganizers = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }) });
     fetch(`${API}/organizers?${params}`).then(r => r.json()).then(d => { setOrganizers(d.organizers); setTotal(d.total); }).catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchOrganizers();
   }, [page, search]);
+
+  const deleteOrganizer = async (id) => {
+    if (window.confirm('Are you sure you want to delete this organizer?')) {
+      await fetch(`${API}/organizers/${id}`, { method: 'DELETE' });
+      fetchOrganizers();
+    }
+  };
 
   return (
     <div>
@@ -37,6 +48,7 @@ export default function Organizers() {
             <th style={th}>Assembly</th>
             <th style={th}>Contact</th>
             <th style={th}>WhatsApp</th>
+            <th style={th}>Actions</th>
           </tr></thead>
           <tbody>
             {organizers.map(o => (
@@ -47,9 +59,14 @@ export default function Organizers() {
                 <td style={td}>{o.assembly}</td>
                 <td style={td}>{o.contact}</td>
                 <td style={td}>{o.whatsappNumber || '-'}</td>
+                <td style={td}>
+                  <button onClick={() => deleteOrganizer(o._id)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 6px', borderRadius: 6, cursor: 'pointer' }}>
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
-            {organizers.length === 0 && <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No organizers found</td></tr>}
+            {organizers.length === 0 && <tr><td colSpan={7} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No organizers found</td></tr>}
           </tbody>
         </table>
       </div>

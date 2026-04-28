@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -13,10 +13,21 @@ export default function Members() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
+  const fetchMembers = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }) });
     fetch(`${API}/members?${params}`).then(r => r.json()).then(d => { setMembers(d.members); setTotal(d.total); }).catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchMembers();
   }, [page, search]);
+
+  const deleteMember = async (id) => {
+    if (window.confirm('Are you sure you want to delete this member?')) {
+      await fetch(`${API}/members/${id}`, { method: 'DELETE' });
+      fetchMembers();
+    }
+  };
 
   return (
     <div>
@@ -36,7 +47,8 @@ export default function Members() {
             <th style={th}>Business</th>
             <th style={th}>District</th>
             <th style={th}>Assembly</th>
-            <th style={th}>Contact</th>
+            <th style={th}>Contact for member</th>
+            <th style={th}>Actions</th>
           </tr></thead>
           <tbody>
             {members.map(m => (
@@ -47,9 +59,14 @@ export default function Members() {
                 <td style={td}>{m.district}</td>
                 <td style={td}>{m.assembly}</td>
                 <td style={td}>{m.contact}</td>
+                <td style={td}>
+                  <button onClick={() => deleteMember(m._id)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 6px', borderRadius: 6, cursor: 'pointer' }}>
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
-            {members.length === 0 && <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No members found</td></tr>}
+            {members.length === 0 && <tr><td colSpan={7} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No members found</td></tr>}
           </tbody>
         </table>
       </div>

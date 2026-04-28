@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -31,6 +31,13 @@ export default function Businesses() {
   const updateStatus = async (id, status) => {
     await fetch(`${API}/businesses/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
     fetchData();
+  };
+
+  const deleteItem = async (id) => {
+    if (window.confirm('Are you sure you want to delete this business?')) {
+      await fetch(`${API}/businesses/${id}`, { method: 'DELETE' });
+      fetchData();
+    }
   };
 
   return (
@@ -87,6 +94,9 @@ export default function Businesses() {
                         <Clock size={16} />
                       </button>
                     )}
+                    <button onClick={() => deleteItem(b._id)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 6px', borderRadius: 6, cursor: 'pointer' }}>
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </td>
               </tr>

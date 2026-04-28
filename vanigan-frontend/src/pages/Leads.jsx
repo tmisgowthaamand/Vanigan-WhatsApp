@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Eye, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -21,6 +21,14 @@ export default function Leads() {
   };
 
   useEffect(() => { fetchLeads(); }, [page, search]);
+
+  const deleteLead = async (id, e) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this lead?')) {
+      await fetch(`${API}/leads/${id}`, { method: 'DELETE' });
+      fetchLeads();
+    }
+  };
 
   const stateColors = {
     'choose_service': '#6366f1', 'business_list': '#10b981', 'organizer_district': '#f59e0b',
@@ -95,9 +103,14 @@ export default function Leads() {
                 <td style={td}>{new Date(l.firstContactAt).toLocaleDateString('en-IN')}</td>
                 <td style={td}>{new Date(l.lastActivityAt).toLocaleString('en-IN')}</td>
                 <td style={td}>
-                  <button onClick={() => { fetch(`${API}/leads/${l._id}`).then(r => r.json()).then(setSelected); }} style={{ background: '#6366f120', border: 'none', color: '#6366f1', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Eye size={14} /> View
-                  </button>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button onClick={(e) => { e.stopPropagation(); fetch(`${API}/leads/${l._id}`).then(r => r.json()).then(setSelected); }} style={{ background: '#6366f120', border: 'none', color: '#6366f1', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Eye size={14} /> View
+                    </button>
+                    <button onClick={(e) => deleteLead(l._id, e)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

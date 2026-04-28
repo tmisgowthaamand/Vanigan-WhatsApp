@@ -83,6 +83,16 @@ router.get('/leads/:id', async (req, res) => {
   }
 });
 
+router.delete('/leads/:id', async (req, res) => {
+  try {
+    const lead = await Lead.findByIdAndDelete(req.params.id);
+    if (!lead) return res.status(404).json({ error: 'Lead not found' });
+    res.json({ success: true, message: 'Lead deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Users ──
 router.get('/users', async (req, res) => {
   try {
@@ -103,6 +113,16 @@ router.get('/users', async (req, res) => {
 
     const total = await User.countDocuments(query);
     res.json({ users, total, page: parseInt(page), totalPages: Math.ceil(total / limit) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true, message: 'User deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -148,6 +168,16 @@ router.patch('/businesses/:id', async (req, res) => {
   }
 });
 
+router.delete('/businesses/:id', async (req, res) => {
+  try {
+    const business = await Business.findByIdAndDelete(req.params.id);
+    if (!business) return res.status(404).json({ error: 'Business not found' });
+    res.json({ success: true, message: 'Business deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Organizers ──
 router.get('/organizers', async (req, res) => {
   try {
@@ -169,6 +199,16 @@ router.get('/organizers', async (req, res) => {
 
     const total = await Organizer.countDocuments(query);
     res.json({ organizers, total, page: parseInt(page), totalPages: Math.ceil(total / limit) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/organizers/:id', async (req, res) => {
+  try {
+    const organizer = await Organizer.findByIdAndDelete(req.params.id);
+    if (!organizer) return res.status(404).json({ error: 'Organizer not found' });
+    res.json({ success: true, message: 'Organizer deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -200,6 +240,16 @@ router.get('/members', async (req, res) => {
   }
 });
 
+router.delete('/members/:id', async (req, res) => {
+  try {
+    const member = await Member.findByIdAndDelete(req.params.id);
+    if (!member) return res.status(404).json({ error: 'Member not found' });
+    res.json({ success: true, message: 'Member deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Districts ──
 router.get('/districts', async (req, res) => {
   try {
@@ -226,6 +276,16 @@ router.get('/payments', async (req, res) => {
 
     const total = await Payment.countDocuments(query);
     res.json({ payments, total, page: parseInt(page), totalPages: Math.ceil(total / limit) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/payments/:id', async (req, res) => {
+  try {
+    const payment = await Payment.findByIdAndDelete(req.params.id);
+    if (!payment) return res.status(404).json({ error: 'Payment not found' });
+    res.json({ success: true, message: 'Payment deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

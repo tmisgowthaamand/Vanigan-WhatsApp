@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -19,10 +19,21 @@ export default function Payments() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
 
-  useEffect(() => {
+  const fetchPayments = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(statusFilter && { status: statusFilter }) });
     fetch(`${API}/payments?${params}`).then(r => r.json()).then(d => { setPayments(d.payments); setTotal(d.total); }).catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchPayments();
   }, [page, statusFilter]);
+
+  const deletePayment = async (id) => {
+    if (window.confirm('Are you sure you want to delete this payment record?')) {
+      await fetch(`${API}/payments/${id}`, { method: 'DELETE' });
+      fetchPayments();
+    }
+  };
 
   return (
     <div>
@@ -45,6 +56,7 @@ export default function Payments() {
             <th style={th}>Status</th>
             <th style={th}>Razorpay ID</th>
             <th style={th}>Date</th>
+            <th style={th}>Actions</th>
           </tr></thead>
           <tbody>
             {payments.map(p => (
@@ -55,9 +67,14 @@ export default function Payments() {
                 <td style={td}><span style={statusBadge(p.status)}>{p.status}</span></td>
                 <td style={{ ...td, fontSize: '0.8rem', color: '#64748b' }}>{p.razorpayPaymentId || p.razorpayOrderId || '-'}</td>
                 <td style={td}>{new Date(p.createdAt).toLocaleString('en-IN')}</td>
+                <td style={td}>
+                  <button onClick={() => deletePayment(p._id)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 6px', borderRadius: 6, cursor: 'pointer' }}>
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
-            {payments.length === 0 && <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No payments found</td></tr>}
+            {payments.length === 0 && <tr><td colSpan={7} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No payments found</td></tr>}
           </tbody>
         </table>
       </div>

@@ -12,6 +12,12 @@ const webhookRoutes = require('./src/routes/webhook');
 const razorpayRoutes = require('./src/routes/razorpayWebhook');
 const adminRoutes = require('./src/routes/admin');
 
+const multer = require('multer');
+const upload = multer({ 
+  dest: 'uploads/', 
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -47,16 +53,33 @@ app.get('/api/districts', async (req, res) => {
   }
 });
 
-// Web Form Submission
-app.post('/api/business/submit-form', async (req, res) => {
+// Check if user already submitted a business
+app.get('/api/business/status', async (req, res) => {
+  try {
+    const { phone } = req.query;
+    if (!phone) return res.json({ success: false });
+    const biz = await Business.findOne({ ownerWhatsapp: phone });
+    if (biz) {
+      return res.json({ success: true, exists: true, status: biz.status });
+    }
+    return res.json({ success: true, exists: false });
+  } catch (err) {
+    res.json({ success: false });
+  }
+});
+
+// Web Form Submission (Handles Multipart Form Data)
+app.post('/api/business/submit-form', upload.single('photo'), async (req, res) => {
   try {
     const { whatsappNumber, businessName, address, district, assembly, contact, category } = req.body;
+    const photoUrl = req.file ? `/uploads/${req.file.filename}` : '';
     
     const newBiz = new Business({
       businessName,
       address,
       district,
       assembly,
+      photoUrl,
       contact,
       ownerWhatsapp: whatsappNumber || 'unknown',
       category,

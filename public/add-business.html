@@ -41,6 +41,9 @@
         <option value="">Select Assembly</option>
       </select>
       
+      <label>Business Photo (Max 10MB)</label>
+      <input type="file" id="photo" name="photo" accept="image/*" required>
+      
       <label>Contact Number</label>
       <input type="text" id="contact" name="contact" placeholder="E.g., 9876543210" required>
       
@@ -67,6 +70,27 @@
     document.getElementById('whatsappNumber').value = urlParams.get('phone') || '';
 
     let districtsData = [];
+
+    async function checkStatus(phone) {
+      if (!phone) return;
+      try {
+        const res = await fetch(`/api/business/status?phone=${phone}`);
+        const json = await res.json();
+        if (json.exists) {
+          document.getElementById('bizForm').style.display = 'none';
+          const msg = document.getElementById('statusMsg');
+          let statusText = json.status === 'pending' ? 'under review' : json.status;
+          msg.innerHTML = `ℹ️ You have already submitted a business.<br><br>Current Status: <b>${statusText.toUpperCase()}</b><br><br>You can close this window.`;
+          msg.style.background = '#e0f2fe';
+          msg.style.color = '#075985';
+          msg.style.display = 'block';
+          return true; // Stop loading form
+        }
+      } catch (e) {
+        console.error('Status check failed', e);
+      }
+      return false;
+    }
 
     async function loadDistricts() {
       try {
@@ -109,29 +133,35 @@
       }
     });
 
-    loadDistricts();
+    async function init() {
+      const phone = urlParams.get('phone');
+      const alreadySubmitted = await checkStatus(phone);
+      if (!alreadySubmitted) {
+        loadDistricts();
+      }
+    }
+    
+    init();
 
     document.getElementById('bizForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      const photoInput = document.getElementById('photo');
+      if (photoInput.files.length > 0 && photoInput.files[0].size > 10 * 1024 * 1024) {
+        alert("Photo size must be less than 10MB");
+        return;
+      }
+
       const btn = e.target.querySelector('button');
       btn.textContent = 'Submitting...';
       btn.disabled = true;
 
-      const formData = {
-        whatsappNumber: document.getElementById('whatsappNumber').value,
-        businessName: document.getElementById('businessName').value,
-        address: document.getElementById('address').value,
-        district: document.getElementById('district').value,
-        assembly: document.getElementById('assembly').value,
-        contact: document.getElementById('contact').value,
-        category: document.getElementById('category').value,
-      };
+      const formData = new FormData(e.target);
 
       try {
         const res = await fetch('/api/business/submit-form', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+          body: formData
         });
         
         if (res.ok) {

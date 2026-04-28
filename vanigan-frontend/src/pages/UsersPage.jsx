@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -14,10 +14,21 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
+  const fetchUsers = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }) });
     fetch(`${API}/users?${params}`).then(r => r.json()).then(d => { setUsers(d.users); setTotal(d.total); }).catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, [page, search]);
+
+  const deleteUser = async (id) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      await fetch(`${API}/users/${id}`, { method: 'DELETE' });
+      fetchUsers();
+    }
+  };
 
   const subBadge = (status) => {
     if (status === 'active') return badge('#22c55e20', '#22c55e');
@@ -44,6 +55,7 @@ export default function UsersPage() {
             <th style={th}>Current State</th>
             <th style={th}>Subscription</th>
             <th style={th}>Last Updated</th>
+            <th style={th}>Actions</th>
           </tr></thead>
           <tbody>
             {users.map(u => (
@@ -54,9 +66,14 @@ export default function UsersPage() {
                 <td style={td}><span style={badge('#6366f120', '#6366f1')}>{u.currentState}</span></td>
                 <td style={td}><span style={subBadge(u.subscription?.status)}>{u.subscription?.status || 'none'}{u.subscription?.plan ? ` (${u.subscription.plan})` : ''}</span></td>
                 <td style={td}>{new Date(u.updatedAt).toLocaleString('en-IN')}</td>
+                <td style={td}>
+                  <button onClick={() => deleteUser(u._id)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 6px', borderRadius: 6, cursor: 'pointer' }}>
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
-            {users.length === 0 && <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No users found</td></tr>}
+            {users.length === 0 && <tr><td colSpan={7} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No users found</td></tr>}
           </tbody>
         </table>
       </div>
