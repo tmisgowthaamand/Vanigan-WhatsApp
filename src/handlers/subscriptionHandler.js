@@ -9,11 +9,17 @@ async function handleSubscription(user, text, lang) {
   switch (user.currentState) {
     case 'subscription_plans': {
       let plan = null;
-      if (text === '1') plan = 'monthly';
+      if (text.startsWith('plan_')) {
+        plan = text.replace('plan_', '');
+      } else if (text === '1') plan = 'monthly';
       else if (text === '2') plan = 'yearly';
       else if (text === '3') plan = 'lifetime';
       else {
-        await wa.sendText(num, t.invalidInput + '\n\n' + t.subscriptionPlans);
+        await wa.sendText(num, t.invalidInput);
+        await wa.sendButtons(num, 'Navigate:', [
+          { id: '0', title: 'Back' },
+          { id: '9', title: 'Main Menu' }
+        ]);
         return;
       }
 
@@ -67,11 +73,22 @@ async function startSubscriptionFlow(user, lang) {
   user.selectedService = 'subscription';
   await user.save();
 
-  await wa.sendText(user.whatsappNumber, lang.subscriptionPlans);
+  const sections = [{
+    title: 'Premium Plans',
+    rows: [
+      { id: 'plan_monthly', title: 'Monthly Plan', description: 'Rs.10 (test)' },
+      { id: 'plan_yearly', title: 'Yearly Plan', description: 'Rs.20 (test)' },
+      { id: 'plan_lifetime', title: 'Lifetime Plan', description: 'Rs.30 (test)' }
+    ]
+  }];
+
+  await wa.sendList(user.whatsappNumber, 'Subscription Plans', 'Choose a premium plan to unlock full access:', 'View Plans', sections);
+  
   await wa.sendButtons(user.whatsappNumber, 'Navigate:', [
     { id: '0', title: 'Back' },
     { id: '9', title: 'Main Menu' }
   ]);
+  
   await trackAction(user.whatsappNumber, 'subscription_plans', 'started', '', {});
 }
 
