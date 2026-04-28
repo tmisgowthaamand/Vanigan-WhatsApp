@@ -63,30 +63,24 @@ async function handleBusinessList(user, text, lang) {
       });
 
       msg += `${t.pageInfo.replace('{current}', currentPage).replace('{total}', totalPages)}`;
-      msg += t.backToMenu;
+      msg += `\n\n0. Back`;
 
       user.tempData.page = currentPage;
       await user.save();
       await wa.sendText(num, msg);
 
-      // Send page navigation buttons (WhatsApp allows max 3 buttons)
+      // Send navigation buttons (WhatsApp allows max 3 buttons)
+      // Always include Main Menu button + up to 2 page buttons
+      const navButtons = [];
       if (totalPages > 1) {
-        const pageButtons = [];
-        for (let p = 1; p <= totalPages && pageButtons.length < 3; p++) {
+        for (let p = 1; p <= totalPages && navButtons.length < 2; p++) {
           if (p !== currentPage) {
-            pageButtons.push({ id: `page_${p}`, title: `📄 Page ${p}` });
+            navButtons.push({ id: `page_${p}`, title: `Page ${p}` });
           }
         }
-        // If we have room and skipped pages, add them
-        if (pageButtons.length < 3) {
-          for (let p = totalPages; p >= 1 && pageButtons.length < 3; p--) {
-            if (p !== currentPage && !pageButtons.find(b => b.id === `page_${p}`)) {
-              pageButtons.push({ id: `page_${p}`, title: `📄 Page ${p}` });
-            }
-          }
-        }
-        await wa.sendButtons(num, `${t.pagesLabel || 'Pages:'} ${currentPage} / ${totalPages}`, pageButtons);
       }
+      navButtons.push({ id: '9', title: 'Main Menu' });
+      await wa.sendButtons(num, `Page ${currentPage} of ${totalPages}`, navButtons);
 
       await trackAction(num, 'business_list', 'view_list', text, { page: currentPage });
       break;
@@ -112,13 +106,19 @@ async function showBusinessDetails(user, business, t) {
   msg += `Contact: ${business.contact || 'N/A'}\n`;
   msg += `Status: ${business.status}\n`;
   if (business.mapLink) msg += `Map: ${business.mapLink}\n`;
-  msg += t.backToMenu;
+  msg += `\n0. Back`;
 
   if (business.photoUrl) {
     await wa.sendImage(num, business.photoUrl, msg);
   } else {
     await wa.sendText(num, msg);
   }
+
+  // Always show Main Menu button
+  await wa.sendButtons(num, 'What would you like to do?', [
+    { id: '0', title: 'Back' },
+    { id: '9', title: 'Main Menu' }
+  ]);
 }
 
 // Entry point: user chose "1. Business List" from menu
@@ -142,18 +142,19 @@ async function startBusinessListFlow(user, lang) {
     msg += `${i + 1}. *${b.businessName}*\n   ${b.district} | ${b.contact || 'N/A'}\n\n`;
   });
   msg += `${lang.pageInfo.replace('{current}', 1).replace('{total}', totalPages)}`;
-  msg += lang.backToMenu;
+  msg += `\n\n0. Back`;
 
   await wa.sendText(user.whatsappNumber, msg);
 
-  // Send page navigation buttons (WhatsApp allows max 3 buttons)
+  // Send navigation buttons - always include Main Menu + up to 2 page buttons
+  const navButtons = [];
   if (totalPages > 1) {
-    const pageButtons = [];
-    for (let p = 2; p <= totalPages && pageButtons.length < 3; p++) {
-      pageButtons.push({ id: `page_${p}`, title: `📄 Page ${p}` });
+    for (let p = 2; p <= totalPages && navButtons.length < 2; p++) {
+      navButtons.push({ id: `page_${p}`, title: `Page ${p}` });
     }
-    await wa.sendButtons(user.whatsappNumber, `${lang.pagesLabel || 'Pages:'} 1 / ${totalPages}`, pageButtons);
   }
+  navButtons.push({ id: '9', title: 'Main Menu' });
+  await wa.sendButtons(user.whatsappNumber, `Page 1 of ${totalPages}`, navButtons);
 
   await trackAction(user.whatsappNumber, 'business_list', 'started', '', {});
 }
