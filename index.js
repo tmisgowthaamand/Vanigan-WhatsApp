@@ -45,8 +45,11 @@ app.get('/api/health', (req, res) => {
 // Serve frontend static files in production
 const frontendDist = path.join(__dirname, 'vanigan-frontend', 'dist');
 app.use(express.static(frontendDist));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendDist, 'index.html'));
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/webhook') || req.path.startsWith('/razorpay')) {
+    return next();
+  }
+  return res.sendFile(path.join(frontendDist, 'index.html'));
 });
 
 // Start server
