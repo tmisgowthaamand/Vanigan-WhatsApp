@@ -5,6 +5,7 @@ const { trackAction } = require('../services/leadTracker');
 const { downloadMedia } = require('../services/whatsapp');
 const fs = require('fs');
 const path = require('path');
+const { sendDistrictList, sendAssemblyList } = require('../utils/whatsappUtils');
 
 async function handleAddBusiness(user, text, lang, message) {
   const t = lang;
@@ -38,25 +39,23 @@ async function handleAddBusiness(user, text, lang, message) {
       await user.save();
 
       const districts = await District.find().sort({ name: 1 }).lean();
-      let msg = t.addBusinessDistrict;
-      districts.forEach((d, i) => {
-        msg += `${i + 1}. ${d.name}\n`;
-      });
-      msg += `\n0. Back`;
-      await wa.sendText(num, msg);
-      await wa.sendButtons(num, 'Navigate:', [
-        { id: '0', title: 'Back' },
-        { id: '9', title: 'Main Menu' }
-      ]);
+      await sendDistrictList(num, lang, districts);
       await trackAction(num, 'add_business_district', 'enter_address', text, {});
       break;
     }
 
     case 'add_business_district': {
       const districts = await District.find().sort({ name: 1 }).lean();
-      const idx = parseInt(text) - 1;
+      let selected = null;
+      
+      if (text.startsWith('dist_')) {
+        selected = districts.find(d => d.name === text.replace('dist_', ''));
+      } else if (!isNaN(text)) {
+        const idx = parseInt(text) - 1;
+        if (idx >= 0 && idx < districts.length) selected = districts[idx];
+      }
 
-      if (isNaN(text) || idx < 0 || idx >= districts.length) {
+      if (!selected) {
         await wa.sendText(num, t.invalidInput);
         await wa.sendButtons(num, 'Navigate:', [
           { id: '0', title: 'Back' },
@@ -65,22 +64,12 @@ async function handleAddBusiness(user, text, lang, message) {
         return;
       }
 
-      const selected = districts[idx];
       user.tempData.district = selected.name;
       user.currentState = 'add_business_assembly';
       await user.save();
 
-      let msg = t.addBusinessAssembly;
-      selected.assemblies.forEach((a, i) => {
-        msg += `${i + 1}. ${a.name}\n`;
-      });
-      msg += `\n0. Back`;
-      await wa.sendText(num, msg);
-      await wa.sendButtons(num, 'Navigate:', [
-        { id: '0', title: 'Back' },
-        { id: '9', title: 'Main Menu' }
-      ]);
-      await trackAction(num, 'add_business_assembly', 'select_district', text, { district: selected.name });
+      await sendAssemblyList(num, lang, selected);
+      await trackAction(num, 'add_business_assembly', 'select_district', selected.name, { district: selected.name });
       break;
     }
 
@@ -91,8 +80,20 @@ async function handleAddBusiness(user, text, lang, message) {
         return;
       }
 
-      const idx = parseInt(text) - 1;
-      if (isNaN(text) || idx < 0 || idx >= district.assemblies.length) {
+      let selectedAssembly = null;
+      if (text.startsWith('asm_')) {
+        const asmName = text.replace('asm_', '');
+        if (district.assemblies.find(a => a.name === asmName)) {
+          selectedAssembly = asmName;
+        }
+      } else if (!isNaN(text)) {
+        const idx = parseInt(text) - 1;
+        if (idx >= 0 && idx < district.assemblies.length) {
+          selectedAssembly = district.assemblies[idx].name;
+        }
+      }
+
+      if (!selectedAssembly) {
         await wa.sendText(num, t.invalidInput);
         await wa.sendButtons(num, 'Navigate:', [
           { id: '0', title: 'Back' },
@@ -101,7 +102,7 @@ async function handleAddBusiness(user, text, lang, message) {
         return;
       }
 
-      user.tempData.assembly = district.assemblies[idx].name;
+      user.tempData.assembly = selectedAssembly;
       user.currentState = 'add_business_contact';
       await user.save();
       await wa.sendText(num, t.addBusinessContact);

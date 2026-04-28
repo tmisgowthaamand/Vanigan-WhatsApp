@@ -9,6 +9,7 @@ const { handleOrganizer, startOrganizerFlow } = require('./organizerHandler');
 const { handleMember, startMemberFlow } = require('./memberHandler');
 const { handleAddBusiness, startAddBusinessFlow } = require('./addBusinessHandler');
 const { handleSubscription, startSubscriptionFlow } = require('./subscriptionHandler');
+const { sendDistrictList, sendAssemblyList } = require('../utils/whatsappUtils');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://vanigan-whats-app.vercel.app/';
 
@@ -204,15 +205,10 @@ async function reEnterState(user, lang) {
   } else if (state === 'organizer_district') {
     await startOrganizerFlow(user, lang);
   } else if (state === 'organizer_assembly') {
-    // Re-show assembly list for selected district
     const District = require('../models/District');
     const district = await District.findOne({ name: user.tempData.selectedDistrict }).lean();
     if (district) {
-      let msg = lang.selectAssembly;
-      district.assemblies.forEach((a, i) => { msg += `${i + 1}. ${a.name}\n`; });
-      msg += `\n0. Back`;
-      await wa.sendText(num, msg);
-      await sendNavButtons(num);
+      await sendAssemblyList(num, lang, district);
     }
   } else if (state === 'member_district') {
     await startMemberFlow(user, lang);
@@ -220,11 +216,7 @@ async function reEnterState(user, lang) {
     const District = require('../models/District');
     const district = await District.findOne({ name: user.tempData.selectedDistrict }).lean();
     if (district) {
-      let msg = lang.selectAssembly;
-      district.assemblies.forEach((a, i) => { msg += `${i + 1}. ${a.name}\n`; });
-      msg += `\n0. Back`;
-      await wa.sendText(num, msg);
-      await sendNavButtons(num);
+      await sendAssemblyList(num, lang, district);
     }
   } else if (state === 'add_business_name') {
     await wa.sendText(num, lang.addBusinessName);
@@ -235,20 +227,12 @@ async function reEnterState(user, lang) {
   } else if (state === 'add_business_district') {
     const District = require('../models/District');
     const districts = await District.find().sort({ name: 1 }).lean();
-    let msg = lang.addBusinessDistrict;
-    districts.forEach((d, i) => { msg += `${i + 1}. ${d.name}\n`; });
-    msg += `\n0. Back`;
-    await wa.sendText(num, msg);
-    await sendNavButtons(num);
+    await sendDistrictList(num, lang, districts);
   } else if (state === 'add_business_assembly') {
     const District = require('../models/District');
     const district = await District.findOne({ name: user.tempData.district }).lean();
     if (district) {
-      let msg = lang.addBusinessAssembly;
-      district.assemblies.forEach((a, i) => { msg += `${i + 1}. ${a.name}\n`; });
-      msg += `\n0. Back`;
-      await wa.sendText(num, msg);
-      await sendNavButtons(num);
+      await sendAssemblyList(num, lang, district);
     }
   } else if (state === 'add_business_contact') {
     await wa.sendText(num, lang.addBusinessContact);
