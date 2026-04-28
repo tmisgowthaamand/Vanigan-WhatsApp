@@ -260,6 +260,62 @@ router.get('/districts', async (req, res) => {
   }
 });
 
+// ── Reset User Subscription ──
+router.post('/users/:id/reset-subscription', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.subscription = {
+      plan: '',
+      status: 'none',
+      razorpayOrderId: undefined,
+      razorpayPaymentId: undefined,
+      razorpaySubscriptionId: undefined,
+      startDate: undefined,
+      endDate: undefined
+    };
+    user.currentState = 'choose_service';
+    user.tempData = {};
+    await user.save();
+
+    // Also delete related payment records
+    await Payment.deleteMany({ whatsappNumber: user.whatsappNumber });
+
+    res.json({ success: true, message: `Subscription reset for ${user.whatsappNumber}` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Reset subscription by WhatsApp number
+router.post('/reset-subscription/:phone', async (req, res) => {
+  try {
+    const phone = req.params.phone;
+    const user = await User.findOne({ whatsappNumber: phone });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.subscription = {
+      plan: '',
+      status: 'none',
+      razorpayOrderId: undefined,
+      razorpayPaymentId: undefined,
+      razorpaySubscriptionId: undefined,
+      startDate: undefined,
+      endDate: undefined
+    };
+    user.currentState = 'choose_service';
+    user.tempData = {};
+    await user.save();
+
+    await Payment.deleteMany({ whatsappNumber: phone });
+
+    res.json({ success: true, message: `Subscription reset for ${phone}` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Payments ──
 router.get('/payments', async (req, res) => {
   try {
