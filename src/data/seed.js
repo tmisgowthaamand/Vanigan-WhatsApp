@@ -170,67 +170,87 @@ const districts = [
   ]}
 ];
 
-// ── Sample Businesses (spread across districts) ──
-const businesses = [
-  { businessName: 'Sri Lakshmi Textiles', address: '45, Big Bazaar St, T. Nagar, Chennai 600017', district: 'Chennai', assembly: 'T. Nagar', contact: '9876543210', ownerWhatsapp: '919876543210', category: 'Retail', status: 'approved' },
-  { businessName: 'Ganesh Electronics', address: '12, Anna Salai, Egmore, Chennai 600008', district: 'Chennai', assembly: 'Egmore', contact: '9876543211', ownerWhatsapp: '919876543211', category: 'Electronics', status: 'approved' },
-  { businessName: 'Murugan Stores', address: '78, Perambur High Rd, Chennai 600011', district: 'Chennai', assembly: 'Perambur', contact: '9876543212', ownerWhatsapp: '919876543212', category: 'Grocery', status: 'approved' },
-  { businessName: 'Anand Furniture House', address: '23, Velachery Main Rd, Chennai 600042', district: 'Chennai', assembly: 'Velachery', contact: '9876543213', ownerWhatsapp: '919876543213', category: 'Furniture', status: 'approved' },
-  { businessName: 'Kovai Craft Exports', address: '56, Avinashi Rd, Coimbatore 641018', district: 'Coimbatore', assembly: 'Coimbatore North', contact: '9845123456', ownerWhatsapp: '919845123456', category: 'Manufacturing', status: 'approved' },
-  { businessName: 'Pollachi Coconut Traders', address: '89, Bazaar St, Pollachi 642001', district: 'Coimbatore', assembly: 'Pollachi', contact: '9845123457', ownerWhatsapp: '919845123457', category: 'Trading', status: 'approved' },
-  { businessName: 'Madurai Meenakshi Silks', address: '34, East Masi St, Madurai 625001', district: 'Madurai', assembly: 'Madurai East', contact: '9823456789', ownerWhatsapp: '919823456789', category: 'Retail', status: 'approved' },
-  { businessName: 'Trichy Gold Palace', address: '67, Big Bazaar St, Trichy 620001', district: 'Tiruchirappalli', assembly: 'Tiruchirappalli East', contact: '9812345678', ownerWhatsapp: '919812345678', category: 'Jewellery', status: 'approved' },
-  { businessName: 'Salem Steel Works', address: '11, Industrial Area, Salem 636004', district: 'Salem', assembly: 'Salem North', contact: '9834567890', ownerWhatsapp: '919834567890', category: 'Manufacturing', status: 'approved' },
-  { businessName: 'Tiruppur Knit Exports', address: '22, TEKIC Area, Tiruppur 641604', district: 'Tiruppur', assembly: 'Tiruppur North', contact: '9856789012', ownerWhatsapp: '919856789012', category: 'Garments', status: 'approved' },
-  { businessName: 'Nagercoil Spice Mart', address: '5, Court Rd, Nagercoil 629001', district: 'Kanniyakumari', assembly: 'Nagercoil', contact: '9867890123', ownerWhatsapp: '919867890123', category: 'Spices', status: 'approved' },
-  { businessName: 'Thanjavur Art Gallery', address: '88, Palace Rd, Thanjavur 613001', district: 'Thanjavur', assembly: 'Thanjavur', contact: '9878901234', ownerWhatsapp: '919878901234', category: 'Art', status: 'approved' },
-  { businessName: 'Hosur Tech Solutions', address: '45, IT Park, Hosur 635109', district: 'Krishnagiri', assembly: 'Hosur', contact: '9889012345', ownerWhatsapp: '919889012345', category: 'IT Services', status: 'approved' },
-  { businessName: 'Erode Turmeric Market', address: '33, Market St, Erode 638001', district: 'Erode', assembly: 'Erode East', contact: '9890123456', ownerWhatsapp: '919890123456', category: 'Trading', status: 'approved' },
-  { businessName: 'Vellore Leather Works', address: '77, Long Bazaar, Vellore 632001', district: 'Vellore', assembly: 'Vellore', contact: '9801234567', ownerWhatsapp: '919801234567', category: 'Manufacturing', status: 'approved' },
-  { businessName: 'Dindigul Lock Factory', address: '14, Palani Rd, Dindigul 624001', district: 'Dindigul', assembly: 'Dindigul', contact: '9712345678', ownerWhatsapp: '919712345678', category: 'Manufacturing', status: 'pending' },
-  { businessName: 'Sivakasi Crackers Hub', address: '99, Industrial Estate, Sivakasi 626123', district: 'Virudhunagar', assembly: 'Sivakasi', contact: '9723456789', ownerWhatsapp: '919723456789', category: 'Fireworks', status: 'approved' },
-  { businessName: 'Kumbakonam Degree Coffee', address: '8, Temple St, Kumbakonam 612001', district: 'Thanjavur', assembly: 'Kumbakonam', contact: '9734567890', ownerWhatsapp: '919734567890', category: 'Food', status: 'approved' }
-];
+// ── Auto-generate sample data for ALL 38 districts ──
+// 10 businesses, 10 organizers, 10 members per district
 
-// ── Sample Organizers ──
-const organizers = [
-  { name: 'Rajesh Kumar', district: 'Chennai', assembly: 'T. Nagar', contact: '9876500001', position: 'District President', whatsappNumber: '919876500001' },
-  { name: 'Prakash Raj', district: 'Chennai', assembly: 'Anna Nagar', contact: '9876500002', position: 'Secretary', whatsappNumber: '919876500002' },
-  { name: 'Arun Kumar', district: 'Chennai', assembly: 'Velachery', contact: '9876500003', position: 'Treasurer', whatsappNumber: '919876500003' },
-  { name: 'Senthil Murugan', district: 'Coimbatore', assembly: 'Coimbatore North', contact: '9845500001', position: 'District President', whatsappNumber: '919845500001' },
-  { name: 'Karthik Raja', district: 'Coimbatore', assembly: 'Singanallur', contact: '9845500002', position: 'Secretary', whatsappNumber: '919845500002' },
-  { name: 'Mani Kandan', district: 'Madurai', assembly: 'Madurai East', contact: '9823500001', position: 'District President', whatsappNumber: '919823500001' },
-  { name: 'Venkatesh Babu', district: 'Madurai', assembly: 'Thiruparankundram', contact: '9823500002', position: 'Organizer', whatsappNumber: '919823500002' },
-  { name: 'Ravi Shankar', district: 'Tiruchirappalli', assembly: 'Srirangam', contact: '9812500001', position: 'District President', whatsappNumber: '919812500001' },
-  { name: 'Kumar Swamy', district: 'Salem', assembly: 'Salem North', contact: '9834500001', position: 'District President', whatsappNumber: '919834500001' },
-  { name: 'Bala Subramanian', district: 'Tiruppur', assembly: 'Tiruppur North', contact: '9856500001', position: 'District President', whatsappNumber: '919856500001' },
-  { name: 'Pandian Raju', district: 'Thanjavur', assembly: 'Thanjavur', contact: '9878500001', position: 'District President', whatsappNumber: '919878500001' },
-  { name: 'Gopi Nathan', district: 'Kanniyakumari', assembly: 'Nagercoil', contact: '9867500001', position: 'District President', whatsappNumber: '919867500001' },
-  { name: 'Saravanan K', district: 'Erode', assembly: 'Erode East', contact: '9890500001', position: 'District President', whatsappNumber: '919890500001' },
-  { name: 'Dinesh Kumar', district: 'Vellore', assembly: 'Vellore', contact: '9801500001', position: 'District President', whatsappNumber: '919801500001' },
-  { name: 'Mohan Raj', district: 'Tiruvallur', assembly: 'Ambattur', contact: '9876500010', position: 'District President', whatsappNumber: '919876500010' }
-];
+const firstNames = ['Rajesh', 'Senthil', 'Karthik', 'Murugan', 'Arun', 'Prakash', 'Ganesh', 'Lakshmi', 'Priya', 'Kavitha', 'Selvam', 'Bharathi', 'Kumaran', 'Velu', 'Anitha', 'Deepa', 'Gopi', 'Shankar', 'Revathi', 'Bala'];
+const lastNames = ['Kumar', 'Raj', 'Pandian', 'Moorthy', 'Devi', 'Subramanian', 'Nathan', 'Babu', 'Kannan', 'Swamy', 'Narayanan', 'Rajan', 'Murugesan', 'Krishnan', 'Sundaram', 'Mani', 'Perumal', 'Velmurugan', 'Palanisamy', 'Ramasamy'];
+const positions = ['District President', 'Secretary', 'Treasurer', 'Joint Secretary', 'Vice President', 'Organizer', 'Coordinator', 'Area Head', 'Youth Wing Leader', 'Women Wing Leader'];
+const memberPositions = ['Business Owner', 'Entrepreneur', 'Trader', 'Manufacturer', 'Exporter', 'Retailer', 'Farmer', 'IT Professional', 'Artisan', 'Service Provider'];
+const bizTypes = ['Textiles', 'Electronics', 'Grocery', 'Furniture', 'Hardware', 'Pharmacy', 'Jewellery', 'Restaurant', 'Auto Parts', 'Stationery'];
+const bizCategories = ['Retail', 'Manufacturing', 'Trading', 'Services', 'Food', 'IT Services', 'Textiles', 'Exports', 'Agriculture', 'Healthcare'];
+const bizPrefixes = ['Sri', 'New', 'Royal', 'Golden', 'Star', 'Modern', 'Classic', 'Premium', 'Super', 'Grand'];
 
-// ── Sample Members ──
-const members = [
-  { name: 'Suresh Babu', district: 'Chennai', assembly: 'T. Nagar', contact: '9876600001', position: 'Business Owner', businessName: 'Suresh IT Solutions', whatsappNumber: '919876600001' },
-  { name: 'Ramesh Kumar', district: 'Chennai', assembly: 'Anna Nagar', contact: '9876600002', position: 'Entrepreneur', businessName: 'Ramesh Catering', whatsappNumber: '919876600002' },
-  { name: 'Vijay Kumar', district: 'Chennai', assembly: 'Velachery', contact: '9876600003', position: 'Trader', businessName: 'Vijay Textiles', whatsappNumber: '919876600003' },
-  { name: 'Lakshmi Devi', district: 'Chennai', assembly: 'Mylapore', contact: '9876600004', position: 'Business Owner', businessName: 'Lakshmi Handicrafts', whatsappNumber: '919876600004' },
-  { name: 'Ganesh Moorthy', district: 'Coimbatore', assembly: 'Coimbatore South', contact: '9845600001', position: 'Exporter', businessName: 'GM Exports', whatsappNumber: '919845600001' },
-  { name: 'Priya Devi', district: 'Coimbatore', assembly: 'Pollachi', contact: '9845600002', position: 'Farmer Entrepreneur', businessName: 'Priya Organics', whatsappNumber: '919845600002' },
-  { name: 'Muthu Pandian', district: 'Madurai', assembly: 'Madurai East', contact: '9823600001', position: 'Retailer', businessName: 'Pandian Stores', whatsappNumber: '919823600001' },
-  { name: 'Kannan S', district: 'Madurai', assembly: 'Melur', contact: '9823600002', position: 'Manufacturer', businessName: 'Kannan Industries', whatsappNumber: '919823600002' },
-  { name: 'Selva Kumar', district: 'Tiruchirappalli', assembly: 'Tiruchirappalli West', contact: '9812600001', position: 'Trader', businessName: 'Selva Gold', whatsappNumber: '919812600001' },
-  { name: 'Nagaraj V', district: 'Salem', assembly: 'Salem South', contact: '9834600001', position: 'Business Owner', businessName: 'Nagaraj Steel', whatsappNumber: '919834600001' },
-  { name: 'Bala Murugan', district: 'Tiruppur', assembly: 'Tiruppur South', contact: '9856600001', position: 'Exporter', businessName: 'BM Knits', whatsappNumber: '919856600001' },
-  { name: 'Thirunavukarasu', district: 'Thanjavur', assembly: 'Kumbakonam', contact: '9878600001', position: 'Artisan', businessName: 'Thiru Art Works', whatsappNumber: '919878600001' },
-  { name: 'Joseph Raj', district: 'Kanniyakumari', assembly: 'Nagercoil', contact: '9867600001', position: 'Trader', businessName: 'Raj Spices', whatsappNumber: '919867600001' },
-  { name: 'Manikandan P', district: 'Erode', assembly: 'Bhavani', contact: '9890600001', position: 'Farmer', businessName: 'Mani Farm Fresh', whatsappNumber: '919890600001' },
-  { name: 'Ashok Kumar', district: 'Vellore', assembly: 'Katpadi', contact: '9801600001', position: 'Manufacturer', businessName: 'Ashok Leathers', whatsappNumber: '919801600001' },
-  { name: 'Sathya Narayanan', district: 'Tiruvallur', assembly: 'Ambattur', contact: '9876600010', position: 'IT Professional', businessName: 'Sathya Tech', whatsappNumber: '919876600010' },
-  { name: 'Durai Raj', district: 'Krishnagiri', assembly: 'Hosur', contact: '9889600001', position: 'IT Entrepreneur', businessName: 'Durai Software', whatsappNumber: '919889600001' }
-];
+function generateBusinesses() {
+  const businesses = [];
+  districts.forEach((district, dIdx) => {
+    const assemblies = district.assemblies;
+    for (let i = 0; i < 10; i++) {
+      const assembly = assemblies[i % assemblies.length];
+      const phone = `98${String(dIdx).padStart(2, '0')}${String(100 + i).padStart(6, '0')}`;
+      businesses.push({
+        businessName: `${bizPrefixes[i]} ${district.name} ${bizTypes[i]}`,
+        address: `${10 + i}, Main Road, ${assembly.name}, ${district.name}`,
+        district: district.name,
+        assembly: assembly.name,
+        contact: phone,
+        ownerWhatsapp: `91${phone}`,
+        category: bizCategories[i],
+        status: 'approved'
+      });
+    }
+  });
+  return businesses;
+}
+
+function generateOrganizers() {
+  const organizers = [];
+  districts.forEach((district, dIdx) => {
+    const assemblies = district.assemblies;
+    for (let i = 0; i < 10; i++) {
+      const assembly = assemblies[i % assemblies.length];
+      const nameIdx = (dIdx + i) % firstNames.length;
+      const lastIdx = (dIdx + i + 3) % lastNames.length;
+      const phone = `97${String(dIdx).padStart(2, '0')}${String(200 + i).padStart(6, '0')}`;
+      organizers.push({
+        name: `${firstNames[nameIdx]} ${lastNames[lastIdx]}`,
+        district: district.name,
+        assembly: assembly.name,
+        contact: phone,
+        position: positions[i],
+        whatsappNumber: `91${phone}`
+      });
+    }
+  });
+  return organizers;
+}
+
+function generateMembers() {
+  const members = [];
+  districts.forEach((district, dIdx) => {
+    const assemblies = district.assemblies;
+    for (let i = 0; i < 10; i++) {
+      const assembly = assemblies[i % assemblies.length];
+      const nameIdx = (dIdx + i + 5) % firstNames.length;
+      const lastIdx = (dIdx + i + 7) % lastNames.length;
+      const phone = `96${String(dIdx).padStart(2, '0')}${String(300 + i).padStart(6, '0')}`;
+      members.push({
+        name: `${firstNames[nameIdx]} ${lastNames[lastIdx]}`,
+        district: district.name,
+        assembly: assembly.name,
+        contact: phone,
+        position: memberPositions[i],
+        businessName: `${firstNames[nameIdx]} ${bizTypes[i]}`,
+        whatsappNumber: `91${phone}`
+      });
+    }
+  });
+  return members;
+}
+
+const businesses = generateBusinesses();
+const organizers = generateOrganizers();
+const members = generateMembers();
 
 async function seed() {
   try {
