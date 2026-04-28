@@ -18,7 +18,10 @@ async function sendDistrictList(num, lang, districts) {
     sections.push(currentSection);
   }
 
-  await wa.sendList(num, lang.selectDistrict, 'Choose a district from the list below:', 'View Districts', sections);
+  // WhatsApp list headers cannot contain markdown or newlines (max 60 chars)
+  const safeHeader = lang.selectDistrict ? lang.selectDistrict.replace(/\*/g, '').split('\n')[0].substring(0, 60) : 'Select District';
+
+  await wa.sendList(num, safeHeader, 'Choose a district from the list below:', 'View Districts', sections);
   
   // Also send navigation buttons
   await wa.sendButtons(num, 'Navigate:', [
@@ -43,7 +46,9 @@ async function sendAssemblyList(num, lang, district) {
     sections.push(currentSection);
   }
 
-  await wa.sendList(num, lang.selectAssembly, `Choose an assembly in ${district.name}:`, 'View Assemblies', sections);
+  const safeHeader = lang.selectAssembly ? lang.selectAssembly.replace(/\*/g, '').split('\n')[0].substring(0, 60) : 'Select Assembly';
+
+  await wa.sendList(num, safeHeader, `Choose an assembly in ${district.name}:`, 'View Assemblies', sections);
   
   await wa.sendButtons(num, 'Navigate:', [
     { id: '0', title: 'Back' },
