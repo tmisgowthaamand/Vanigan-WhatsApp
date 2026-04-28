@@ -22,7 +22,7 @@ module.exports = {
   // Subscription
   subscriptionPlans: `*Choose a Subscription Plan*\n\n1. Monthly Plan - Rs.10 (test)\n2. Yearly Plan - Rs.20 (test)\n3. Lifetime Plan - Rs.30 (test)\n\nReply with the plan number.`,
   paymentLinkMsg: `*{plan} Plan*\nAmount: Rs.{amount}\n\nClick the link below to complete payment:\n{paymentLink}\n\nAfter payment, you will receive a confirmation message.`,
-  paymentSuccess: `*Payment Successful!*\n\nYour *{plan}* subscription is now active.\nValid till: {endDate}\n\nThank you for subscribing!\n\nReply 9 for Main Menu.`,
+  paymentSuccess: `✅ *Payment Successful!*\n\n*Subscription Confirmation*\n━━━━━━━━━━━━━━━━━━━━\n📋 *Plan:* {plan}\n💰 *Amount Paid:* ₹{amount}\n🆔 *Payment ID:* {paymentId}\n📅 *Start Date:* {startDate}\n📅 *Valid Till:* {endDate}\n📌 *Status:* Active\n━━━━━━━━━━━━━━━━━━━━\n\nThank you for subscribing! You now have full access to all premium features.\n\nReply 9 for Main Menu.`,
   paymentFailed: `*Payment Failed*\n\nPlease try again or contact support.\n\nReply 9 for Main Menu.`,
   waitingPayment: `We are waiting for your payment confirmation.\n\nIf you have already paid, please wait a moment.\nIf not, reply 5 to see plans again.\n\nReply 9 for Main Menu.`,
   

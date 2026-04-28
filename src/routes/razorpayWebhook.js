@@ -76,11 +76,15 @@ router.post('/webhook', async (req, res) => {
           { upsert: true }
         );
 
-        // Send success message via WhatsApp
+        // Send success confirmation message via WhatsApp
         const lang = user.language === 'ta' ? ta : en;
         const planNames = { monthly: 'Monthly', yearly: 'Yearly', lifetime: 'Lifetime' };
+        const amountPaid = paymentEntity.amount / 100;
         const msg = lang.paymentSuccess
           .replace('{plan}', planNames[plan] || plan)
+          .replace('{amount}', amountPaid)
+          .replace('{paymentId}', paymentEntity.id)
+          .replace('{startDate}', now.toLocaleDateString('en-IN'))
           .replace('{endDate}', endDate.toLocaleDateString('en-IN'));
 
         await wa.sendText(whatsappNumber, msg);
