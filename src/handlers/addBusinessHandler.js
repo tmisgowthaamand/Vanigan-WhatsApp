@@ -211,17 +211,27 @@ async function handleAddBusiness(user, text, lang, message) {
 }
 
 async function startAddBusinessFlow(user, lang) {
-  user.currentState = 'add_business_name';
+  // Clear any existing state so they aren't stuck in a flow
+  user.currentState = 'idle';
+  user.selectedService = 'idle';
   user.tempData = {};
-  user.selectedService = 'add_business';
   await user.save();
 
-  await wa.sendText(user.whatsappNumber, lang.addBusinessName);
+  // Dynamically resolve the backend URL depending on the environment
+  // We use FRONTEND_URL or BASE_URL or fallback to localhost
+  let baseUrl = process.env.BASE_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+  if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+  
+  const formUrl = `${baseUrl}/public/add-business.html?phone=${user.whatsappNumber}`;
+
+  let msg = `*Add Business Form*\n\nPlease click the secure link below to quickly fill out your business details:\n\n🔗 ${formUrl}\n\n_Once you submit the form, you will receive a confirmation message here._`;
+  
+  await wa.sendText(user.whatsappNumber, msg);
   await wa.sendButtons(user.whatsappNumber, 'Navigate:', [
-    { id: '0', title: 'Back' },
     { id: '9', title: 'Main Menu' }
   ]);
-  await trackAction(user.whatsappNumber, 'add_business_name', 'started', '', {});
+  
+  await trackAction(user.whatsappNumber, 'add_business_form', 'started', '', {});
 }
 
 module.exports = { handleAddBusiness, startAddBusinessFlow };

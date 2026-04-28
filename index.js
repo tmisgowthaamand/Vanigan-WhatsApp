@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const connectDB = require('./src/config/db');
+const Business = require('./src/models/Business');
+const wa = require('./src/services/whatsapp');
 
 const webhookRoutes = require('./src/routes/webhook');
 const razorpayRoutes = require('./src/routes/razorpayWebhook');
@@ -25,13 +27,45 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files
+// Serve uploaded files and public static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.use('/webhook', webhookRoutes);
 app.use('/razorpay', razorpayRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Web Form Submission
+app.post('/api/business/submit-form', async (req, res) => {
+  try {
+    const { whatsappNumber, businessName, address, district, assembly, contact, category } = req.body;
+    
+    const newBiz = new Business({
+      businessName,
+      address,
+      district,
+      assembly,
+      contact,
+      ownerWhatsapp: whatsappNumber || 'unknown',
+      category,
+      status: 'pending' // Admin approval required
+    });
+    
+    await newBiz.save();
+    
+    // Send confirmation message to the user on WhatsApp
+    if (whatsappNumber && whatsappNumber !== 'unknown') {
+      const msg = `*Your business has been submitted successfully!*\n\nBusiness Name: ${businessName}\nDistrict: ${district}\nCategory: ${category}\n\nOur team will review and publish it shortly.\n\nReply 9 for Main Menu.`;
+      await wa.sendText(whatsappNumber, msg);
+    }
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error submitting web form:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
