@@ -20,6 +20,12 @@ export default function Businesses() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
 
   const fetchData = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }), ...(statusFilter && { status: statusFilter }) });
@@ -34,10 +40,9 @@ export default function Businesses() {
   };
 
   const deleteItem = async (id) => {
-    if (window.confirm('Are you sure you want to delete this business?')) {
-      await fetch(`${API}/businesses/${id}`, { method: 'DELETE' });
-      fetchData();
-    }
+    await fetch(`${API}/businesses/${id}`, { method: 'DELETE' });
+    fetchData();
+    showToast('Deleted successfully');
   };
 
   return (
@@ -111,6 +116,12 @@ export default function Businesses() {
         <span style={{ color: '#94a3b8', alignSelf: 'center', fontSize: '0.85rem' }}>Page {page}</span>
         <button disabled={businesses.length < 15} onClick={() => setPage(p => p + 1)} style={{ background: '#1e293b', border: '1px solid #334155', color: '#e2e8f0', padding: '6px 12px', borderRadius: 6, cursor: businesses.length >= 15 ? 'pointer' : 'not-allowed', opacity: businesses.length >= 15 ? 1 : 0.4 }}><ChevronRight size={16} /></button>
       </div>
+
+      {toast && (
+        <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#10b981', color: '#fff', padding: '12px 20px', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontWeight: 500, fontSize: '0.9rem', zIndex: 1000, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <CheckCircle size={18} /> {toast}
+        </div>
+      )}
     </div>
   );
 }

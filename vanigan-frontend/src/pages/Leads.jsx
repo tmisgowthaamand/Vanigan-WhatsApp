@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Eye, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Search, Eye, ChevronLeft, ChevronRight, Trash2, CheckCircle } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -14,6 +14,12 @@ export default function Leads() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
 
   const fetchLeads = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }) });
@@ -24,10 +30,9 @@ export default function Leads() {
 
   const deleteLead = async (id, e) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this lead?')) {
-      await fetch(`${API}/leads/${id}`, { method: 'DELETE' });
-      fetchLeads();
-    }
+    await fetch(`${API}/leads/${id}`, { method: 'DELETE' });
+    fetchLeads();
+    showToast('Deleted successfully');
   };
 
   const stateColors = {
@@ -129,6 +134,12 @@ export default function Leads() {
           <ChevronRight size={16} />
         </button>
       </div>
+
+      {toast && (
+        <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#10b981', color: '#fff', padding: '12px 20px', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontWeight: 500, fontSize: '0.9rem', zIndex: 1000, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <CheckCircle size={18} /> {toast}
+        </div>
+      )}
     </div>
   );
 }

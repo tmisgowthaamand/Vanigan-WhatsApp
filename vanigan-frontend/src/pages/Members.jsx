@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Trash2, CheckCircle } from 'lucide-react';
 import { API } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -12,6 +12,12 @@ export default function Members() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
 
   const fetchMembers = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }) });
@@ -23,10 +29,9 @@ export default function Members() {
   }, [page, search]);
 
   const deleteMember = async (id) => {
-    if (window.confirm('Are you sure you want to delete this member?')) {
-      await fetch(`${API}/members/${id}`, { method: 'DELETE' });
-      fetchMembers();
-    }
+    await fetch(`${API}/members/${id}`, { method: 'DELETE' });
+    fetchMembers();
+    showToast('Deleted successfully');
   };
 
   return (
@@ -76,6 +81,12 @@ export default function Members() {
         <span style={{ color: '#94a3b8', alignSelf: 'center', fontSize: '0.85rem' }}>Page {page}</span>
         <button disabled={members.length < 15} onClick={() => setPage(p => p + 1)} style={{ background: '#1e293b', border: '1px solid #334155', color: '#e2e8f0', padding: '6px 12px', borderRadius: 6, cursor: members.length >= 15 ? 'pointer' : 'not-allowed', opacity: members.length >= 15 ? 1 : 0.4 }}><ChevronRight size={16} /></button>
       </div>
+
+      {toast && (
+        <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#10b981', color: '#fff', padding: '12px 20px', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontWeight: 500, fontSize: '0.9rem', zIndex: 1000, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <CheckCircle size={18} /> {toast}
+        </div>
+      )}
     </div>
   );
 }
