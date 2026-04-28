@@ -127,13 +127,47 @@ router.get('/callback', async (req, res) => {
   // The bot's phone number without + or spaces
   const botNumber = process.env.BOT_PHONE_NUMBER || '15551596475';
   
-  if (razorpay_payment_link_status === 'paid') {
-    const text = encodeURIComponent('Paid successfully');
-    return res.redirect(`https://wa.me/${botNumber}?text=${text}`);
+  let text = 'Paid successfully';
+  if (razorpay_payment_link_status !== 'paid') {
+    text = `Payment status: ${razorpay_payment_link_status || 'unknown'}`;
   }
   
-  const text = encodeURIComponent(`Payment status: ${razorpay_payment_link_status || 'unknown'}`);
-  return res.redirect(`https://wa.me/${botNumber}?text=${text}`);
+  const encodedText = encodeURIComponent(text);
+  const waMeUrl = `https://wa.me/${botNumber}?text=${encodedText}`;
+  const deepLink = `whatsapp://send?phone=${botNumber}&text=${encodedText}`;
+
+  return res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Redirecting to WhatsApp...</title>
+        <style>
+          body { font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f0fdf4; color: #166534; text-align: center; padding: 20px; }
+          .loader { border: 4px solid #bbf7d0; border-top: 4px solid #22c55e; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+          .btn { display: inline-block; background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 24px; font-weight: 600; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="loader"></div>
+        <h2>Redirecting you back to WhatsApp...</h2>
+        <p>If you are not redirected automatically within a few seconds, please click the button below.</p>
+        <a href="${waMeUrl}" class="btn">Return to WhatsApp</a>
+        <script>
+          setTimeout(function() {
+            // Try to open WhatsApp app directly via deep link
+            window.location.href = "${deepLink}";
+            
+            // Fallback to wa.me if the deep link fails
+            setTimeout(function() {
+              window.location.href = "${waMeUrl}";
+            }, 1000);
+          }, 100);
+        </script>
+      </body>
+    </html>
+  `);
 });
 
 module.exports = router;
