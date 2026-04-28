@@ -46,6 +46,13 @@ async function handleAddBusiness(user, text, lang, message) {
 
     case 'add_business_district': {
       const districts = await District.find().sort({ name: 1 }).lean();
+
+      if (text.startsWith('distpage_')) {
+        const page = parseInt(text.replace('distpage_', '')) || 1;
+        await sendDistrictList(num, lang, districts, page);
+        return;
+      }
+
       let selected = null;
       
       if (text.startsWith('dist_')) {
@@ -77,6 +84,12 @@ async function handleAddBusiness(user, text, lang, message) {
       const district = await District.findOne({ name: user.tempData.district }).lean();
       if (!district) {
         await wa.sendText(num, t.error);
+        return;
+      }
+
+      if (text.startsWith('asmpage_')) {
+        const page = parseInt(text.replace('asmpage_', '')) || 1;
+        await sendAssemblyList(num, lang, district, page);
         return;
       }
 

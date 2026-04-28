@@ -11,6 +11,13 @@ async function handleOrganizer(user, text, lang) {
   switch (user.currentState) {
     case 'organizer_district': {
       const districts = await District.find().sort({ name: 1 }).lean();
+
+      if (text.startsWith('distpage_')) {
+        const page = parseInt(text.replace('distpage_', '')) || 1;
+        await sendDistrictList(num, lang, districts, page);
+        return;
+      }
+
       let selected = null;
       
       if (text.startsWith('dist_')) {
@@ -42,6 +49,12 @@ async function handleOrganizer(user, text, lang) {
       const district = await District.findOne({ name: user.tempData.selectedDistrict }).lean();
       if (!district) {
         await wa.sendText(num, t.error);
+        return;
+      }
+
+      if (text.startsWith('asmpage_')) {
+        const page = parseInt(text.replace('asmpage_', '')) || 1;
+        await sendAssemblyList(num, lang, district, page);
         return;
       }
 
