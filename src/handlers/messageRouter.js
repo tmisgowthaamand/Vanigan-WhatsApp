@@ -45,8 +45,21 @@ async function handleMessage(messageData) {
   const lang = user.language === 'ta' ? ta : en;
 
   // ── Global commands ──
-  // "9" or "menu" → back to main menu
-  if (text === '9' || text.toLowerCase() === 'menu') {
+  // "9" → end the flow
+  if (text === '9') {
+    user.currentState = 'choose_service';
+    user.tempData = {};
+    await user.save();
+    const endMsg = user.language === 'ta' 
+      ? `*நன்றி! வணிகன் பயன்படுத்தியதற்கு நன்றி.*\n\nமீண்டும் தொடங்க *hi* அல்லது *vanigan* என அனுப்புங்கள்.`
+      : `*Thank you for using Vanigan!*\n\nSend *hi* or *vanigan* to start again.`;
+    await wa.sendText(from, endMsg);
+    await trackAction(from, 'choose_service', 'end_flow', text, {});
+    return;
+  }
+
+  // "menu" → back to main menu
+  if (text.toLowerCase() === 'menu') {
     user.currentState = 'choose_service';
     user.tempData = {};
     await user.save();

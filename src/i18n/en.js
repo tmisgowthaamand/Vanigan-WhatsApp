@@ -8,7 +8,7 @@ module.exports = {
   organizerListTitle: `*Organizers in {district} - {assembly}*\n\n`,
   memberListTitle: `*Members in {district} - {assembly}*\n\n`,
   noResults: `No results found. Try a different selection.`,
-  backToMenu: `\n\n0. Back\n9. Main Menu`,
+  backToMenu: `\n\n0. Back\n9. End`,
   
   // Add Business Flow
   addBusinessName: `Please enter your *Business Name*:`,
@@ -33,4 +33,5 @@ module.exports = {
   // Pagination
   nextPage: `\n\nN. Next Page\nP. Previous Page`,
   pageInfo: `Page {current} of {total}`,
+  pagesLabel: `Pages:`,
 };

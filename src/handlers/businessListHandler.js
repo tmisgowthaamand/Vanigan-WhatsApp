@@ -17,13 +17,19 @@ async function handleBusinessList(user, text, lang) {
       if (user.tempData.selectedDistrict) query.district = user.tempData.selectedDistrict;
       if (user.tempData.selectedAssembly) query.assembly = user.tempData.selectedAssembly;
 
-      // Handle pagination commands
-      if (text.toLowerCase() === 'n') {
-        user.tempData.page = (user.tempData.page || 1) + 1;
-      } else if (text.toLowerCase() === 'p' && (user.tempData.page || 1) > 1) {
-        user.tempData.page = (user.tempData.page || 1) - 1;
-      } else if (!isNaN(text) && parseInt(text) > 0) {
-        // User selected a business by number
+      // Calculate total pages first for validation
+      const totalForNav = await Business.countDocuments(query);
+      const totalPagesForNav = Math.ceil(totalForNav / PAGE_SIZE) || 1;
+
+      // Handle page navigation commands (e.g., "p2", "p3", etc.)
+      const pageMatch = text.toLowerCase().match(/^p(\d+)$/);
+      if (pageMatch) {
+        const requestedPage = parseInt(pageMatch[1]);
+        if (requestedPage >= 1 && requestedPage <= totalPagesForNav) {
+          user.tempData.page = requestedPage;
+        }
+      } else if (!isNaN(text) && parseInt(text) > 0 && parseInt(text) <= PAGE_SIZE) {
+        // User selected a business by number (1-5)
         const businesses = await Business.find(query).skip(((user.tempData.page || 1) - 1) * PAGE_SIZE).limit(PAGE_SIZE).lean();
         const idx = parseInt(text) - 1;
         if (idx >= 0 && idx < businesses.length) {
@@ -57,8 +63,19 @@ async function handleBusinessList(user, text, lang) {
       });
 
       msg += `${t.pageInfo.replace('{current}', currentPage).replace('{total}', totalPages)}`;
-      if (currentPage < totalPages) msg += `\nN. Next Page`;
-      if (currentPage > 1) msg += `\nP. Previous Page`;
+      // Show page numbers for navigation (e.g., "Pages: p1 | *p2* | p3 | p4")
+      if (totalPages > 1) {
+        let pageNav = '\n' + (t.pagesLabel || 'Pages:') + ' ';
+        for (let p = 1; p <= totalPages; p++) {
+          if (p === currentPage) {
+            pageNav += `[*${p}*]`;
+          } else {
+            pageNav += `p${p}`;
+          }
+          if (p < totalPages) pageNav += ' | ';
+        }
+        msg += pageNav;
+      }
       msg += t.backToMenu;
 
       user.tempData.page = currentPage;
@@ -118,7 +135,19 @@ async function startBusinessListFlow(user, lang) {
     msg += `${i + 1}. *${b.businessName}*\n   ${b.district} | ${b.contact || 'N/A'}\n\n`;
   });
   msg += `${lang.pageInfo.replace('{current}', 1).replace('{total}', totalPages)}`;
-  if (totalPages > 1) msg += `\nN. Next Page`;
+  // Show page numbers for navigation
+  if (totalPages > 1) {
+    let pageNav = '\n' + (lang.pagesLabel || 'Pages:') + ' ';
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1) {
+        pageNav += `[*${p}*]`;
+      } else {
+        pageNav += `p${p}`;
+      }
+      if (p < totalPages) pageNav += ' | ';
+    }
+    msg += pageNav;
+  }
   msg += lang.backToMenu;
 
   await wa.sendText(user.whatsappNumber, msg);
