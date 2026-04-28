@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./src/config/db');
 
 const webhookRoutes = require('./src/routes/webhook');
@@ -48,6 +49,14 @@ app.use(express.static(frontendDist));
 app.use((req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/webhook') || req.path.startsWith('/razorpay')) {
     return next();
+  }
+  const indexFile = path.join(frontendDist, 'index.html');
+  if (!fs.existsSync(indexFile)) {
+    return res.json({
+      status: 'Online',
+      message: 'Vanigan WhatsApp Bot API is active. Frontend is hosted separately.',
+      frontendUrl: process.env.FRONTEND_URL || 'https://vanigan-whats-app.vercel.app/'
+    });
   }
   return res.sendFile(path.join(frontendDist, 'index.html'));
 });
