@@ -1,16 +1,54 @@
-# React + Vite
+# 🌐 Vanigan Web Portal (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The **Vanigan Frontend** is the mobile-responsive web interface for the Vanigan community platform. It enables users to browse extensive directories of businesses, members, and organizers across their district.
 
-Currently, two official plugins are available:
+### 🌟 Features
+- **Responsive Dashboard**: Optimized for all devices (Mobile and Desktop).
+- **Business Directories**: Integrated views for Retail, Service, and Manufacturing sectors.
+- **District Filters**: Narrow down searches by district and assembly.
+- **Community Analytics**: Insights into community growth and member performance.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+### 🛠️ Tech Stack
+- **Framework**: [React.js](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: Vanilla CSS (Modern, premium look)
+- **Deployment**: [Vercel](https://vercel.com/)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+### ⚡ Local Development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1.  **Navigate to the folder**:
+    ```bash
+    cd vanigan-frontend
+    ```
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+3.  **Run in dev mode**:
+    ```bash
+    npm run dev
+    ```
+    Access the app at `http://localhost:5173`.
+
+---
+
+### 🚀 Deployment
+This project is configured for **Vercel**. 
+- The `vercel.json` file handles the routing and build configuration.
+- To deploy, connect your GitHub repository to the Vercel dashboard.
+
+---
+
+### 🏗️ Directory Structure
+- `src/components/`: Reusable UI elements.
+- `src/pages/`: Views like Dashboard, Business List, etc.
+- `public/`: Static assets (e.g., logo, banners).
+- `vite.config.js`: Vite build configuration.
+
+---
+
+Developed for the Vanigan Platform community.
