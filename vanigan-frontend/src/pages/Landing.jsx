@@ -259,7 +259,7 @@ function PhonePreview() {
         <div className="chat-screen">
           <div className="chat-topbar">
             <div className="bot-avatar" style={{ background: 'transparent', boxShadow: 'none' }}>
-              <img src="https://vanigan.digital/vaniganlogo.png" alt="Vanigan Assistant" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+              <img src="https://vanigan.digital/vaniganlogo.png" alt="Vanigan Assistant" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: '50%' }} />
             </div>
             <div>
               <strong>Vanigan Assistant</strong>
@@ -340,7 +340,7 @@ function Landing() {
         <div className="container nav-container">
           <Link to="/" className="brand" onClick={closeMenu}>
             <span className="brand-mark" style={{ background: 'transparent', border: 'none' }}>
-              <img src="https://vanigan.digital/vaniganlogo.png" alt="Vanigan Logo" style={{ width: 38, height: 38, objectFit: 'contain' }} />
+              <img src="https://vanigan.digital/vaniganlogo.png" alt="Vanigan Logo" style={{ width: 38, height: 38, objectFit: 'contain', borderRadius: '50%' }} />
             </span>
             <span>Vanigan</span>
             <span className="brand-accent">App</span>
@@ -538,7 +538,7 @@ function Landing() {
         <Reveal className="container footer-inner">
           <Link to="/" className="brand">
             <span className="brand-mark" style={{ background: 'transparent', border: 'none' }}>
-              <img src="https://vanigan.digital/vaniganlogo.png" alt="Vanigan Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+              <img src="https://vanigan.digital/vaniganlogo.png" alt="Vanigan Logo" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: '50%' }} />
             </span>
             <span>Vanigan</span>
             <span className="brand-accent">App</span>
