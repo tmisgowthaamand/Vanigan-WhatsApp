@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const whatsappUrl = 'https://api.whatsapp.com/send?phone=YOUR_NUMBER&text=Hi';
+const whatsappUrl = 'https://api.whatsapp.com/send?phone=15551596475&text=Hi';
 
 const features = [
   {
