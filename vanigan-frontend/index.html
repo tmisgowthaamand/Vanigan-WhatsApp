@@ -2,28 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="https://vanigan.digital/vaniganlogo.png" id="dynamic-favicon" />
-    <link rel="apple-touch-icon" href="https://vanigan.digital/vaniganlogo.png" />
-    <meta property="og:image" content="https://vanigan.digital/vaniganlogo.png" />
-    <script>
-      (function() {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          canvas.width = 64;
-          canvas.height = 64;
-          const ctx = canvas.getContext('2d');
-          ctx.beginPath();
-          ctx.arc(32, 32, 32, 0, Math.PI * 2);
-          ctx.clip();
-          ctx.drawImage(img, 0, 0, 64, 64);
-          const link = document.getElementById('dynamic-favicon');
-          if (link) link.href = canvas.toDataURL('image/png');
-        };
-        img.src = 'https://vanigan.digital/vaniganlogo.png';
-      })();
-    </script>
+    <!-- Social Metadata -->
+    <meta property="og:title" content="Vanigan App - WhatsApp Business Discovery" />
+    <meta property="og:description" content="Connect local businesses, members, organizers, news, maps, gallery media, and subscription flows through one fast WhatsApp assistant." />
+    <meta property="og:image" content="/icon.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/icon.png" />
+
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <link rel="apple-touch-icon" href="/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vanigan App - WhatsApp Business Discovery</title>
     <meta name="description" content="Connect local businesses, members, organizers, news, maps, gallery media, and subscription flows through one fast WhatsApp assistant." />
