@@ -1,139 +1,418 @@
-import React, { useState, useEffect } from 'react';
-import { Bot, MessageSquare, Briefcase, MapPin, Users, Newspaper, Image as ImageIcon, ArrowRight, CheckCircle2, Menu, X, Smartphone } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ArrowRight,
+  BadgeCheck,
+  Bot,
+  BriefcaseBusiness,
+  CheckCircle2,
+  ChevronRight,
+  Image as ImageIcon,
+  LayoutDashboard,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Newspaper,
+  PhoneCall,
+  Send,
+  ShieldCheck,
+  Smartphone,
+  Sparkles,
+  Users,
+  X,
+  Zap,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const whatsappUrl = 'https://api.whatsapp.com/send?phone=YOUR_NUMBER&text=Hi';
+
+const features = [
+  {
+    icon: BriefcaseBusiness,
+    title: 'Verified business directory',
+    desc: 'District-wise business listings with category, contact, address, maps, and image gallery support.',
+  },
+  {
+    icon: Users,
+    title: 'Members and organizers',
+    desc: 'Assembly and district filters help people discover Vanigan members and organizers quickly.',
+  },
+  {
+    icon: MessageCircle,
+    title: 'Number-based chat flow',
+    desc: 'Simple WhatsApp menu replies guide every user to business lists, news, plans, and onboarding.',
+  },
+  {
+    icon: Newspaper,
+    title: 'Local announcements',
+    desc: 'Share business meetings, startup programs, conferences, and local updates inside the same assistant.',
+  },
+  {
+    icon: ImageIcon,
+    title: 'Gallery-ready listings',
+    desc: 'Let businesses show storefronts, products, and services with rich visual media.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Admin controlled',
+    desc: 'Manage users, leads, businesses, payments, organizers, and members from a protected panel.',
+  },
+];
+
+const stats = [
+  { value: '24/7', label: 'WhatsApp access' },
+  { value: '5', label: 'Core menu flows' },
+  { value: '3', label: 'Listing plans' },
+];
+
+const workflow = [
+  {
+    icon: Send,
+    title: 'User says Hi',
+    desc: 'The assistant opens with clear options for business lists, organizers, members, onboarding, and plans.',
+  },
+  {
+    icon: MapPin,
+    title: 'Select district flow',
+    desc: 'The user narrows results by district, category, or assembly without installing another app.',
+  },
+  {
+    icon: PhoneCall,
+    title: 'Connect instantly',
+    desc: 'Every listing can surface phone, WhatsApp, map, gallery, and promotion details in one chat.',
+  },
+];
+
+const pricing = [
+  {
+    title: 'Monthly',
+    price: '\u20B9199',
+    period: '/month',
+    features: ['Business listing', 'Priority visibility', 'Gallery images', 'Contact access'],
+  },
+  {
+    title: 'Yearly',
+    price: '\u20B91499',
+    period: '/year',
+    popular: true,
+    features: ['All monthly benefits', 'Featured listing', 'Business promotion', 'Priority support'],
+  },
+  {
+    title: 'Lifetime',
+    price: '\u20B94999',
+    period: 'one time',
+    features: ['Lifetime listing', 'Premium visibility', 'Unlimited photos', 'Dedicated support'],
+  },
+];
+
+function Reveal({ children, delay = 0, className = '' }) {
+  return (
+    <div className={`reveal ${className}`} style={{ '--delay': `${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
+function SectionHeading({ eyebrow, title, desc }) {
+  return (
+    <div className="section-heading">
+      <span className="eyebrow">{eyebrow}</span>
+      <h2>{title}</h2>
+      {desc && <p>{desc}</p>}
+    </div>
+  );
+}
+
+function FeatureCard({ item, index }) {
+  const Icon = item.icon;
+
+  return (
+    <Reveal delay={index * 80} className="feature-card">
+      <div className="feature-icon">
+        <Icon size={26} />
+      </div>
+      <h3>{item.title}</h3>
+      <p>{item.desc}</p>
+    </Reveal>
+  );
+}
+
+function PhonePreview() {
+  const menuItems = useMemo(
+    () => ['Business List', 'Organizer List', 'Members List', 'Add Business', 'Subscription Plans'],
+    [],
+  );
+
+  return (
+    <div className="phone-stage" aria-label="WhatsApp assistant preview">
+      <div className="signal-card signal-card-top">
+        <Sparkles size={16} />
+        <span>Smart reply ready</span>
+      </div>
+      <div className="signal-card signal-card-bottom">
+        <Zap size={16} />
+        <span>Lead captured</span>
+      </div>
+
+      <div className="phone-shell">
+        <div className="phone-speaker" />
+        <div className="chat-screen">
+          <div className="chat-topbar">
+            <div className="bot-avatar">
+              <Bot size={22} />
+            </div>
+            <div>
+              <strong>Vanigan Assistant</strong>
+              <span>Online now</span>
+            </div>
+          </div>
+
+          <div className="chat-body">
+            <div className="chat-date">Today</div>
+            <div className="bubble bubble-sent">Hi</div>
+            <div className="bubble bubble-received">
+              <strong>Welcome to Vanigan App</strong>
+              <p>Discover businesses, members, and organizers across your district.</p>
+              <div className="menu-list">
+                {menuItems.map((item, index) => (
+                  <div className="menu-item" key={item} style={{ '--delay': `${650 + index * 120}ms` }}>
+                    <span>{index + 1}</span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bubble bubble-received tiny">
+              Reply with a number to continue.
+            </div>
+          </div>
+
+          <div className="chat-composer">
+            <span>Type a message</span>
+            <button aria-label="Send demo message">
+              <Send size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 24);
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const features = [
-    { icon: <Briefcase size={28} />, title: 'Business Directory', desc: 'Browse categorized retail, manufacturing, services, and more across your district.' },
-    { icon: <Users size={28} />, title: 'Member & Organizer Access', desc: 'Find people by district and assembly, view contact details and business roles seamlessly.' },
-    { icon: <MapPin size={28} />, title: 'Location Services', desc: 'Get precise Google Maps links for businesses directly within your WhatsApp chat.' },
-    { icon: <Newspaper size={28} />, title: 'Local News Updates', desc: 'Stay informed on the latest business meetings, conferences, and startup programs.' },
-    { icon: <ImageIcon size={28} />, title: 'Rich Media Gallery', desc: 'Upload and view business gallery photos straight through WhatsApp.' },
-    { icon: <MessageSquare size={28} />, title: 'Instant Chat Flow', desc: 'Navigation is as simple as sending a number. Intuitive menus guide you anywhere.' }
-  ];
+  useEffect(() => {
+    document.body.classList.toggle('menu-open', isMobileMenuOpen);
+    return () => document.body.classList.remove('menu-open');
+  }, [isMobileMenuOpen]);
 
-  const pricing = [
-    { title: 'Monthly Plan', price: '\u20B9199', period: '/month', features: ['Business Listing', 'Priority Visibility', 'Gallery Images', 'Contact Access'] },
-    { title: 'Yearly Plan', price: '\u20B91499', period: '/year', popular: true, features: ['All Monthly Benefits', 'Featured Listing', 'Business Promotion', 'Priority Support'] },
-    { title: 'Lifetime Plan', price: '\u20B94999', period: 'One Time', features: ['Lifetime Business Listing', 'Premium Visibility', 'Unlimited Photos', 'Dedicated 24/7 Support'] }
-  ];
+  const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <>
-      <div className="bg-gradient"></div>
+    <div className="site-shell">
+      <div className="ambient-grid" />
+
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="container nav-container">
-          <div className="logo"><Bot size={32} className="logo-icon" />Vanigan<span className="text-gradient">App</span></div>
-          <div className="nav-links desktop-only">
-            <a href="#features">Features</a>
-            <a href="#demo">How it Works</a>
-            <a href="#pricing">Pricing</a>
-            <Link to="/admin">Admin Panel</Link>
+          <Link to="/" className="brand" onClick={closeMenu}>
+            <span className="brand-mark">
+              <Bot size={24} />
+            </span>
+            <span>Vanigan</span>
+            <span className="brand-accent">App</span>
+          </Link>
+
+          <div className={`nav-links ${isMobileMenuOpen ? 'open' : ''}`}>
+            <a href="#features" onClick={closeMenu}>Features</a>
+            <a href="#workflow" onClick={closeMenu}>How it works</a>
+            <a href="#pricing" onClick={closeMenu}>Pricing</a>
+            <Link to="/admin" onClick={closeMenu}>Admin Panel</Link>
+            <button className="btn btn-primary nav-cta" onClick={() => window.open(whatsappUrl, '_blank', 'noopener,noreferrer')}>
+              <MessageCircle size={18} />
+              Connect
+            </button>
           </div>
-          <div className="desktop-only"><button className="btn btn-primary">Connect WhatsApp</button></div>
-          <div className="mobile-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </div>
+
+          <button
+            className="mobile-toggle"
+            type="button"
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((value) => !value)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </nav>
 
-      <section className="hero">
-        <div className="container hero-grid">
-          <div className="hero-content">
-            <div className="badge-live"><span className="dot"></span>Live on WhatsApp Cloud API</div>
-            <h1>The Ultimate<br /><span className="text-gradient">Business Discovery</span><br />Bot for Vanigan</h1>
-            <p>Connect, discover, and grow. Access your district's business directory, members list, and latest news entirely through an intelligent WhatsApp assistant.</p>
-            <div className="hero-actions">
-              <button className="btn btn-primary" onClick={() => window.open('https://api.whatsapp.com/send?phone=YOUR_NUMBER&text=Hi', '_blank')}>
-                Try Demo <ArrowRight size={18} />
-              </button>
-              <Link to="/admin" className="btn btn-outline"><Smartphone size={18} /> Admin Panel</Link>
-            </div>
-          </div>
-          <div className="hero-image">
-            <div className="mockup-container">
-              <div className="phone-mockup">
-                <div className="phone-notch"></div>
-                <div className="chat-app">
-                  <div className="chat-header">
-                    <div className="bot-avatar"><Bot size={24} color="white"/></div>
-                    <div>
-                      <h4 style={{ fontSize: '1rem', color: 'white', lineHeight: 1 }}>Vanigan Assistant</h4>
-                      <span style={{ fontSize: '0.75rem', color: '#10B981' }}>Online</span>
-                    </div>
-                  </div>
-                  <div className="chat-body">
-                    <div className="bubble bubble-sent">Hi</div>
-                    <div className="bubble bubble-received" style={{ animation: 'fadeIn 0.5s ease' }}>
-                      <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Welcome to Vanigan App</p>
-                      <p style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>Discover Businesses, Members, and Organizers across your district.</p>
-                      <div className="menu-list">
-                        <div className="menu-item">1. Business List</div>
-                        <div className="menu-item">2. Organizer List</div>
-                        <div className="menu-item">3. Members List</div>
-                        <div className="menu-item">4. Add Business</div>
-                        <div className="menu-item">5. Subscription Plans</div>
-                      </div>
-                    </div>
-                  </div>
+      <main>
+        <section className="hero">
+          <div className="hero-backdrop" />
+          <div className="container hero-grid">
+            <div className="hero-content">
+              <Reveal>
+                <div className="status-pill">
+                  <span className="status-dot" />
+                  Live on WhatsApp Cloud API
                 </div>
-              </div>
+              </Reveal>
+
+              <Reveal delay={80}>
+                <h1>
+                  Vanigan business discovery, built inside WhatsApp.
+                </h1>
+              </Reveal>
+
+              <Reveal delay={160}>
+                <p className="hero-copy">
+                  Connect local businesses, members, organizers, news, maps, gallery media, and subscription flows through one fast WhatsApp assistant.
+                </p>
+              </Reveal>
+
+              <Reveal delay={240}>
+                <div className="hero-actions">
+                  <button className="btn btn-primary" onClick={() => window.open(whatsappUrl, '_blank', 'noopener,noreferrer')}>
+                    Try WhatsApp demo
+                    <ArrowRight size={18} />
+                  </button>
+                  <Link to="/admin" className="btn btn-secondary">
+                    <LayoutDashboard size={18} />
+                    Admin Panel
+                  </Link>
+                </div>
+              </Reveal>
+
+              <Reveal delay={320}>
+                <div className="hero-stats">
+                  {stats.map((item) => (
+                    <div key={item.label}>
+                      <strong>{item.value}</strong>
+                      <span>{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+
+            <Reveal delay={200} className="hero-visual">
+              <PhonePreview />
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="features" className="features section-band">
+          <div className="container">
+            <SectionHeading
+              eyebrow="Product modules"
+              title="Everything your community directory needs"
+              desc="The experience is organized around real user tasks: discover, verify, connect, promote, and manage."
+            />
+            <div className="features-grid">
+              {features.map((item, index) => (
+                <FeatureCard item={item} index={index} key={item.title} />
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="features" className="features">
-        <div className="container">
-          <h2>Powerful Features Built-In</h2>
-          <div className="features-grid">
-            {features.map((item, i) => (
-              <div key={i} className="feature-card" style={{ animationDelay: `${i * 0.1}s` }}>
-                <div className="feature-icon">{item.icon}</div>
-                <h3>{item.title}</h3>
-                <p>{item.desc}</p>
-              </div>
-            ))}
+        <section id="workflow" className="workflow section-band">
+          <div className="container workflow-grid">
+            <div>
+              <SectionHeading
+                eyebrow="Animated flow"
+                title="From first message to useful lead"
+                desc="Every step is designed to feel simple for WhatsApp users and measurable for admins."
+              />
+            </div>
+            <div className="timeline">
+              {workflow.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <Reveal delay={index * 100} className="timeline-item" key={item.title}>
+                    <div className="timeline-icon">
+                      <Icon size={22} />
+                    </div>
+                    <div>
+                      <span>Step {index + 1}</span>
+                      <h3>{item.title}</h3>
+                      <p>{item.desc}</p>
+                    </div>
+                    <ChevronRight size={20} className="timeline-arrow" />
+                  </Reveal>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="pricing" className="pricing">
-        <div className="container">
-          <h2>Subscription Plans</h2>
-          <p className="section-desc">Choose the perfect plan to grow your business presence in your district.</p>
-          <div className="pricing-grid">
-            {pricing.map((plan, i) => (
-              <div key={i} className={`pricing-card ${plan.popular ? 'popular' : ''}`} style={{ animationDelay: `${i * 0.2}s` }}>
-                {plan.popular && <div className="popular-badge">Most Popular</div>}
-                <h3 className={plan.popular ? 'text-primary' : ''}>{plan.title}</h3>
-                <div className="price">{plan.price}<span>{plan.period}</span></div>
-                <ul className="pricing-features">
-                  {plan.features.map((f, j) => (<li key={j}><CheckCircle2 size={18} color="var(--secondary)" /> {f}</li>))}
-                </ul>
-                <button className={`btn ${plan.popular ? 'btn-primary' : 'btn-outline'} btn-full`}>Subscribe via WhatsApp</button>
-              </div>
-            ))}
+        <section id="pricing" className="pricing section-band">
+          <div className="container">
+            <SectionHeading
+              eyebrow="Subscription plans"
+              title="Simple plans for local business growth"
+              desc="Keep onboarding clear, affordable, and easy to explain inside WhatsApp."
+            />
+            <div className="pricing-grid">
+              {pricing.map((plan, index) => (
+                <Reveal delay={index * 100} className={`pricing-card ${plan.popular ? 'popular' : ''}`} key={plan.title}>
+                  {plan.popular && <div className="popular-badge">Best value</div>}
+                  <h3>{plan.title}</h3>
+                  <div className="price">
+                    {plan.price}
+                    <span>{plan.period}</span>
+                  </div>
+                  <ul className="pricing-features">
+                    {plan.features.map((feature) => (
+                      <li key={feature}>
+                        <CheckCircle2 size={18} />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <button className={plan.popular ? 'btn btn-primary btn-full' : 'btn btn-secondary btn-full'}>
+                    Subscribe via WhatsApp
+                  </button>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <footer>
-        <div className="container">
-          <div className="footer-logo"><Bot size={24} className="logo-icon" /><span className="footer-logo-text">VaniganApp</span></div>
-          <p>&copy; 2026 Vanigan Network. All rights reserved.</p>
+        <section className="cta-strip">
+          <div className="container cta-inner">
+            <div>
+              <BadgeCheck size={28} />
+              <h2>Ready to make Vanigan searchable from every phone?</h2>
+            </div>
+            <button className="btn btn-primary" onClick={() => window.open(whatsappUrl, '_blank', 'noopener,noreferrer')}>
+              Launch chat
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer className="footer">
+        <div className="container footer-inner">
+          <Link to="/" className="brand">
+            <span className="brand-mark">
+              <Bot size={20} />
+            </span>
+            <span>Vanigan</span>
+            <span className="brand-accent">App</span>
+          </Link>
+          <p>Copyright 2026 Vanigan Network. All rights reserved.</p>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
 

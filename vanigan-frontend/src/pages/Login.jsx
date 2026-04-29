@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API, setToken } from '../config';
+import { API } from '../config';
 
 export default function Login() {
   const [username, setUsername] = useState(() => {
@@ -45,7 +45,7 @@ export default function Login() {
       } else {
         setError(data.error || 'Invalid credentials');
       }
-    } catch (err) {
+    } catch {
       setError('Server error. Please try again.');
     }
     setLoading(false);
