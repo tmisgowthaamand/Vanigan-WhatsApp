@@ -1,6 +1,7 @@
 const wa = require('../services/whatsapp');
 const { createPaymentLink, PLANS } = require('../services/razorpay');
 const { trackAction } = require('../services/leadTracker');
+const Payment = require('../models/Payment');
 
 async function handleSubscription(user, text, lang) {
   const t = lang;
@@ -24,16 +25,38 @@ async function handleSubscription(user, text, lang) {
       }
 
       try {
-        const result = await createPaymentLink(plan, num, user._id.toString());
+        // Check for existing pending payment link for this user + plan
+        const existingPayment = await Payment.findOne({
+          whatsappNumber: num,
+          plan: plan,
+          status: 'created',
+          razorpayPaymentLinkUrl: { $exists: true, $ne: null }
+        }).sort({ createdAt: -1 });
+
+        let paymentLinkId, paymentLinkUrl, amount;
+
+        if (existingPayment) {
+          // Reuse existing payment link instead of creating a new one
+          paymentLinkId = existingPayment.razorpayPaymentLinkId || existingPayment.razorpayOrderId;
+          paymentLinkUrl = existingPayment.razorpayPaymentLinkUrl;
+          amount = existingPayment.amount;
+        } else {
+          // Create new payment link only if no pending one exists
+          const result = await createPaymentLink(plan, num, user._id.toString());
+          paymentLinkId = result.paymentLinkId;
+          paymentLinkUrl = result.paymentLinkUrl;
+          amount = result.amount;
+        }
 
         // Store payment info in user
         user.tempData.selectedPlan = plan;
-        user.tempData.paymentLinkId = result.paymentLinkId;
+        user.tempData.paymentLinkId = paymentLinkId;
+        user.tempData.paymentLinkUrl = paymentLinkUrl;
         user.subscription = {
           ...user.subscription,
           plan: plan,
           status: 'pending',
-          razorpayOrderId: result.paymentLinkId
+          razorpayOrderId: paymentLinkId
         };
         user.currentState = 'waiting_for_payment';
         await user.save();
@@ -41,12 +64,12 @@ async function handleSubscription(user, text, lang) {
         const planInfo = PLANS[plan];
         const msg = t.paymentLinkMsg
           .replace('{plan}', planInfo.name)
-          .replace('{amount}', result.amount)
-          .replace('{paymentLink}', result.paymentLinkUrl);
+          .replace('{amount}', amount)
+          .replace('{paymentLink}', paymentLinkUrl);
 
         await wa.sendText(num, msg);
         await trackAction(num, 'waiting_for_payment', 'payment_link_sent', plan, {
-          plan, amount: result.amount, paymentLinkId: result.paymentLinkId
+          plan, amount, paymentLinkId
         });
       } catch (err) {
         console.error('Razorpay error:', err.message);
@@ -56,7 +79,19 @@ async function handleSubscription(user, text, lang) {
     }
 
     case 'waiting_for_payment': {
-      await wa.sendText(num, t.waitingPayment);
+      // Resend the existing payment link instead of just a message
+      const paymentLinkUrl = user.tempData.paymentLinkUrl;
+      if (paymentLinkUrl) {
+        const planInfo = PLANS[user.tempData.selectedPlan];
+        const existingAmount = planInfo ? planInfo.amount / 100 : '';
+        const msg = t.paymentLinkMsg
+          .replace('{plan}', planInfo ? planInfo.name : user.tempData.selectedPlan)
+          .replace('{amount}', existingAmount)
+          .replace('{paymentLink}', paymentLinkUrl);
+        await wa.sendText(num, msg);
+      } else {
+        await wa.sendText(num, t.waitingPayment);
+      }
       await wa.sendButtons(num, 'Navigate:', [
         { id: '0', title: 'Back' },
         { id: '9', title: 'Main Menu' }

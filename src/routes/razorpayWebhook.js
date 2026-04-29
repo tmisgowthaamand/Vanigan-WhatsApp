@@ -100,20 +100,20 @@ router.post('/webhook', async (req, res) => {
       if (whatsappNumber) {
         const user = await User.findOne({ whatsappNumber });
         if (user) {
-          user.subscription.status = 'none';
-          user.currentState = 'choose_service';
-          await user.save();
-
+          // Don't reset user state — payment link is still active for retry
           const lang = user.language === 'ta' ? ta : en;
-          await wa.sendText(whatsappNumber, lang.paymentFailed);
-          await trackAction(whatsappNumber, 'choose_service', 'payment_failed', '', {});
+
+          // Resend the existing payment link so user can retry
+          const paymentLinkUrl = user.tempData?.paymentLinkUrl;
+          if (paymentLinkUrl) {
+            await wa.sendText(whatsappNumber, `${lang.paymentFailed}\n\nYou can retry using the same link:\n${paymentLinkUrl}`);
+          } else {
+            await wa.sendText(whatsappNumber, lang.paymentFailed);
+          }
+          await trackAction(whatsappNumber, 'waiting_for_payment', 'payment_failed', '', {});
         }
         
-        // Update payment record to failed
-        const orderId = payload.payment_link ? payload.payment_link.entity.id : paymentEntity.order_id;
-        if (orderId) {
-          await Payment.findOneAndUpdate({ razorpayOrderId: orderId }, { status: 'failed' });
-        }
+        // Do NOT mark payment record as failed — the payment link is still active for retry
       }
     }
 

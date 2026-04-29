@@ -52,6 +52,8 @@ async function createPaymentLink(plan, whatsappNumber, userId) {
       amount: planInfo.amount / 100,
       currency: 'INR',
       razorpayOrderId: paymentLink.id,
+      razorpayPaymentLinkId: paymentLink.id,
+      razorpayPaymentLinkUrl: paymentLink.short_url,
       status: 'created'
     });
   } catch (err) {
