@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Trash2, CheckCircle } from 'lucide-react';
-import { API } from '../config';
+import { API, authFetch } from '../config';
 const API_BASE = import.meta.env.VITE_API_URL || 'https://vanigan-whatsapp-n2c1.onrender.com';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
@@ -28,7 +28,7 @@ export default function Payments() {
 
   const fetchPayments = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(statusFilter && { status: statusFilter }) });
-    fetch(`${API}/payments?${params}`).then(r => r.json()).then(d => { setPayments(d.payments); setTotal(d.total); }).catch(console.error);
+    authFetch(`${API}/payments?${params}`).then(r => r.json()).then(d => { setPayments(d.payments); setTotal(d.total); }).catch(console.error);
   };
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function Payments() {
   }, [page, statusFilter]);
 
   const deletePayment = async (id) => {
-    await fetch(`${API}/payments/${id}`, { method: 'DELETE' });
+    await authFetch(`${API}/payments/${id}`, { method: 'DELETE' });
     fetchPayments();
     showToast('Deleted successfully');
   };

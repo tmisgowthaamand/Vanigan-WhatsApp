@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, ChevronLeft, ChevronRight, Trash2, CheckCircle } from 'lucide-react';
-import { API } from '../config';
+import { API, authFetch } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
 const td = { padding: '12px 16px', borderBottom: '1px solid #1e293b', fontSize: '0.9rem', color: '#e2e8f0' };
@@ -21,7 +21,7 @@ export default function Organizers() {
 
   const fetchOrganizers = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }) });
-    fetch(`${API}/organizers?${params}`).then(r => r.json()).then(d => { setOrganizers(d.organizers); setTotal(d.total); }).catch(console.error);
+    authFetch(`${API}/organizers?${params}`).then(r => r.json()).then(d => { setOrganizers(d.organizers); setTotal(d.total); }).catch(console.error);
   };
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Organizers() {
   }, [page, search]);
 
   const deleteOrganizer = async (id) => {
-    await fetch(`${API}/organizers/${id}`, { method: 'DELETE' });
+    await authFetch(`${API}/organizers/${id}`, { method: 'DELETE' });
     fetchOrganizers();
     showToast('Deleted successfully');
   };

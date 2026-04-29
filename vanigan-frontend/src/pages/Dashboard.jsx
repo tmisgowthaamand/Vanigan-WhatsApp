@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Users, Building2, Target, CreditCard, UserCog, Briefcase, Clock, TrendingUp } from 'lucide-react';
-import { API } from '../config';
+import { API, authFetch } from '../config';
 
 const card = {
   background: '#1e293b', borderRadius: 12, padding: '24px', border: '1px solid #334155',
@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/dashboard`).then(r => r.json()).then(setData).catch(console.error).finally(() => setLoading(false));
+    authFetch(`${API}/dashboard`).then(r => r.json()).then(setData).catch(console.error).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div style={{ color: '#94a3b8', padding: 40 }}>Loading dashboard...</div>;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
-import { API } from '../config';
+import { API, authFetch } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
 const td = { padding: '12px 16px', borderBottom: '1px solid #1e293b', fontSize: '0.9rem', color: '#e2e8f0' };
@@ -29,18 +29,18 @@ export default function Businesses() {
 
   const fetchData = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }), ...(statusFilter && { status: statusFilter }) });
-    fetch(`${API}/businesses?${params}`).then(r => r.json()).then(d => { setBusinesses(d.businesses); setTotal(d.total); }).catch(console.error);
+    authFetch(`${API}/businesses?${params}`).then(r => r.json()).then(d => { setBusinesses(d.businesses); setTotal(d.total); }).catch(console.error);
   };
 
   useEffect(() => { fetchData(); }, [page, search, statusFilter]);
 
   const updateStatus = async (id, status) => {
-    await fetch(`${API}/businesses/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+    await authFetch(`${API}/businesses/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
     fetchData();
   };
 
   const deleteItem = async (id) => {
-    await fetch(`${API}/businesses/${id}`, { method: 'DELETE' });
+    await authFetch(`${API}/businesses/${id}`, { method: 'DELETE' });
     fetchData();
     showToast('Deleted successfully');
   };

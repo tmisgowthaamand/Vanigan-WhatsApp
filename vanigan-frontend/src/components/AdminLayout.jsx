@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, Briefcase, Target, CreditCard, UserCog, Building2, Menu, X, Bot } from 'lucide-react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Users, Briefcase, Target, CreditCard, UserCog, Building2, Menu, X, Bot, LogOut } from 'lucide-react';
+import { clearToken } from '../config';
 
 const navItems = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
@@ -28,6 +29,12 @@ const s = {
 export default function AdminLayout() {
   const [open, setOpen] = useState(false);
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clearToken();
+    navigate('/admin/login');
+  };
 
   return (
     <div style={s.layout}>
@@ -63,8 +70,11 @@ export default function AdminLayout() {
             </NavLink>
           ))}
         </nav>
-        <div style={{ padding: '16px 24px', borderTop: '1px solid #334155', fontSize: '0.75rem', color: '#64748b' }}>
-          <NavLink to="/" style={{ color: '#6366f1', textDecoration: 'none' }}>Back to Website</NavLink>
+        <div style={{ padding: '16px 24px', borderTop: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <NavLink to="/" style={{ color: '#6366f1', textDecoration: 'none', fontSize: '0.75rem' }}>Back to Website</NavLink>
+          <button onClick={handleLogout} style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '6px 12px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', fontWeight: 500 }}>
+            <LogOut size={14} /> Logout
+          </button>
         </div>
       </aside>
 

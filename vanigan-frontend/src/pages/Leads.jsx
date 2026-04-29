@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Eye, ChevronLeft, ChevronRight, Trash2, CheckCircle } from 'lucide-react';
-import { API } from '../config';
+import { API, authFetch } from '../config';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
 const td = { padding: '12px 16px', borderBottom: '1px solid #1e293b', fontSize: '0.9rem', color: '#e2e8f0' };
@@ -23,14 +23,14 @@ export default function Leads() {
 
   const fetchLeads = () => {
     const params = new URLSearchParams({ page, limit: 15, ...(search && { search }) });
-    fetch(`${API}/leads?${params}`).then(r => r.json()).then(d => { setLeads(d.leads); setTotal(d.total); }).catch(console.error);
+    authFetch(`${API}/leads?${params}`).then(r => r.json()).then(d => { setLeads(d.leads); setTotal(d.total); }).catch(console.error);
   };
 
   useEffect(() => { fetchLeads(); }, [page, search]);
 
   const deleteLead = async (id, e) => {
     e.stopPropagation();
-    await fetch(`${API}/leads/${id}`, { method: 'DELETE' });
+    await authFetch(`${API}/leads/${id}`, { method: 'DELETE' });
     fetchLeads();
     showToast('Deleted successfully');
   };
@@ -109,7 +109,7 @@ export default function Leads() {
                 <td style={td}>{new Date(l.lastActivityAt).toLocaleString('en-IN')}</td>
                 <td style={td}>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <button onClick={(e) => { e.stopPropagation(); fetch(`${API}/leads/${l._id}`).then(r => r.json()).then(setSelected); }} style={{ background: '#6366f120', border: 'none', color: '#6366f1', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <button onClick={(e) => { e.stopPropagation(); authFetch(`${API}/leads/${l._id}`).then(r => r.json()).then(setSelected); }} style={{ background: '#6366f120', border: 'none', color: '#6366f1', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                       <Eye size={14} /> View
                     </button>
                     <button onClick={(e) => deleteLead(l._id, e)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>

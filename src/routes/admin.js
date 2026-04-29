@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 const User = require('../models/User');
 const Business = require('../models/Business');
@@ -7,6 +8,54 @@ const Member = require('../models/Member');
 const District = require('../models/District');
 const Lead = require('../models/Lead');
 const Payment = require('../models/Payment');
+
+// ── Admin Auth ──
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
+const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || 'vanigan-admin-secret-2024';
+
+function generateToken(username) {
+  const payload = `${username}:${Date.now()}`;
+  const hmac = crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(payload).digest('hex');
+  return Buffer.from(`${payload}:${hmac}`).toString('base64');
+}
+
+function verifyToken(token) {
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const parts = decoded.split(':');
+    if (parts.length < 3) return false;
+    const hmac = parts.pop();
+    const payload = parts.join(':');
+    const expected = crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(payload).digest('hex');
+    return hmac === expected;
+  } catch { return false; }
+}
+
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const token = authHeader.split(' ')[1];
+  if (!verifyToken(token)) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+  next();
+}
+
+// Login (no auth required)
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    const token = generateToken(username);
+    return res.json({ success: true, token });
+  }
+  return res.status(401).json({ success: false, error: 'Invalid credentials' });
+});
+
+// Protect all routes below
+router.use(authMiddleware);
 
 // ── Dashboard Stats ──
 router.get('/dashboard', async (req, res) => {
