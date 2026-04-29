@@ -36,6 +36,8 @@ export default function Login() {
       if (data.success && data.token) {
         if (rememberMe) {
           localStorage.setItem('admin_token', data.token);
+          localStorage.setItem('saved_username', username);
+          localStorage.setItem('saved_password', password);
         } else {
           sessionStorage.setItem('admin_token', data.token);
         }
