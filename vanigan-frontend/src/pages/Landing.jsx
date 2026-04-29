@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   BadgeCheck,
@@ -104,9 +105,15 @@ const pricing = [
 
 function Reveal({ children, delay = 0, className = '' }) {
   return (
-    <div className={`reveal ${className}`} style={{ '--delay': `${delay}ms` }}>
+    <motion.div
+      initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay: delay / 1000, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -132,28 +139,65 @@ function PageSection({ id, className = '', children }) {
 function HeroMotion() {
   return (
     <div className="hero-motion" aria-hidden="true">
-      <div className="motion-orbit orbit-one">
-        <span />
-      </div>
-      <div className="motion-orbit orbit-two">
-        <span />
-      </div>
+      <motion.div 
+        animate={{ rotate: 360 }} 
+        transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+        className="motion-orbit orbit-one"
+      >
+        <motion.span 
+          animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }} 
+          transition={{ duration: 3, repeat: Infinity }} 
+        />
+      </motion.div>
+      <motion.div 
+        animate={{ rotate: -360 }} 
+        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        className="motion-orbit orbit-two"
+      >
+        <motion.span 
+          animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }} 
+          transition={{ duration: 4, repeat: Infinity }} 
+        />
+      </motion.div>
       <div className="motion-beam" />
-      <div className="motion-node node-one" />
-      <div className="motion-node node-two" />
-      <div className="motion-node node-three" />
-      <div className="motion-chip chip-business">
+      
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          animate={{ 
+            y: ["0%", "-30%", "0%"],
+            x: ["0%", i % 2 === 0 ? "15%" : "-15%", "0%"],
+            opacity: [0.6, 1, 0.6]
+          }}
+          transition={{ duration: 6 + i * 1.5, repeat: Infinity, ease: "easeInOut" }}
+          className={`motion-node node-${['one', 'two', 'three'][i]}`}
+        />
+      ))}
+
+      <motion.div 
+        animate={{ y: [0, -25, 0], rotate: [0, 6, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        className="motion-chip chip-business"
+      >
         <BriefcaseBusiness size={15} />
         Verified listing
-      </div>
-      <div className="motion-chip chip-message">
+      </motion.div>
+      <motion.div 
+        animate={{ y: [0, 30, 0], rotate: [0, -6, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="motion-chip chip-message"
+      >
         <MessageCircle size={15} />
         WhatsApp lead
-      </div>
-      <div className="motion-chip chip-map">
+      </motion.div>
+      <motion.div 
+        animate={{ y: [0, -20, 0], x: [0, 15, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="motion-chip chip-map"
+      >
         <MapPin size={15} />
         District match
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -162,13 +206,20 @@ function FeatureCard({ item, index }) {
   const Icon = item.icon;
 
   return (
-    <Reveal delay={index * 80} className="feature-card motion-card">
-      <span className="module-number">0{index + 1}</span>
-      <div className="feature-icon">
-        <Icon size={26} />
-      </div>
-      <h3>{item.title}</h3>
-      <p>{item.desc}</p>
+    <Reveal delay={index * 100} className="h-full">
+      <motion.div 
+        whileHover={{ y: -10, scale: 1.02 }}
+        transition={{ type: "spring", bounce: 0.4 }}
+        className="feature-card motion-card"
+        style={{ height: '100%' }}
+      >
+        <span className="module-number">0{index + 1}</span>
+        <div className="feature-icon">
+          <Icon size={26} />
+        </div>
+        <h3>{item.title}</h3>
+        <p>{item.desc}</p>
+      </motion.div>
     </Reveal>
   );
 }
@@ -180,15 +231,28 @@ function PhonePreview() {
   );
 
   return (
-    <div className="phone-stage" aria-label="WhatsApp assistant preview">
-      <div className="signal-card signal-card-top">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9, rotateY: 20 }}
+      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+      transition={{ duration: 1.2, type: "spring", bounce: 0.3 }}
+      className="phone-stage" aria-label="WhatsApp assistant preview"
+    >
+      <motion.div 
+        animate={{ y: [0, -12, 0] }} 
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="signal-card signal-card-top"
+      >
         <Sparkles size={16} />
         <span>Smart reply ready</span>
-      </div>
-      <div className="signal-card signal-card-bottom">
+      </motion.div>
+      <motion.div 
+        animate={{ y: [0, 12, 0] }} 
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="signal-card signal-card-bottom"
+      >
         <Zap size={16} />
         <span>Lead captured</span>
-      </div>
+      </motion.div>
 
       <div className="phone-shell">
         <div className="phone-speaker" />
@@ -205,22 +269,37 @@ function PhonePreview() {
 
           <div className="chat-body">
             <div className="chat-date">Today</div>
-            <div className="bubble bubble-sent">Hi</div>
-            <div className="bubble bubble-received">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
+              className="bubble bubble-sent"
+            >
+              Hi
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.2 }}
+              className="bubble bubble-received"
+            >
               <strong>Welcome to Vanigan App</strong>
               <p>Discover businesses, members, and organizers across your district.</p>
               <div className="menu-list">
                 {menuItems.map((item, index) => (
-                  <div className="menu-item" key={item} style={{ '--delay': `${650 + index * 120}ms` }}>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} 
+                    transition={{ delay: 1.8 + index * 0.12 }}
+                    className="menu-item" key={item}
+                  >
                     <span>{index + 1}</span>
                     {item}
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
-            <div className="bubble bubble-received tiny">
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3 }}
+              className="bubble bubble-received tiny"
+            >
               Reply with a number to continue.
-            </div>
+            </motion.div>
           </div>
 
           <div className="chat-composer">
@@ -231,7 +310,7 @@ function PhonePreview() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -369,16 +448,22 @@ function Landing() {
               {workflow.map((item, index) => {
                 const Icon = item.icon;
                 return (
-                  <Reveal delay={index * 100} className="timeline-item motion-card" key={item.title}>
-                    <div className="timeline-icon">
-                      <Icon size={22} />
-                    </div>
-                    <div>
-                      <span>Step {index + 1}</span>
-                      <h3>{item.title}</h3>
-                      <p>{item.desc}</p>
-                    </div>
-                    <ChevronRight size={20} className="timeline-arrow" />
+                  <Reveal delay={index * 150} key={item.title}>
+                    <motion.div 
+                      whileHover={{ x: 10, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                      transition={{ type: "spring", bounce: 0.3 }}
+                      className="timeline-item motion-card"
+                    >
+                      <div className="timeline-icon">
+                        <Icon size={22} />
+                      </div>
+                      <div>
+                        <span>Step {index + 1}</span>
+                        <h3>{item.title}</h3>
+                        <p>{item.desc}</p>
+                      </div>
+                      <ChevronRight size={20} className="timeline-arrow" />
+                    </motion.div>
                   </Reveal>
                 );
               })}
@@ -395,24 +480,35 @@ function Landing() {
             />
             <div className="pricing-grid">
               {pricing.map((plan, index) => (
-                <Reveal delay={index * 100} className={`pricing-card motion-card ${plan.popular ? 'popular' : ''}`} key={plan.title}>
-                  {plan.popular && <div className="popular-badge">Best value</div>}
-                  <h3>{plan.title}</h3>
-                  <div className="price">
-                    {plan.price}
-                    <span>{plan.period}</span>
-                  </div>
-                  <ul className="pricing-features">
-                    {plan.features.map((feature) => (
-                      <li key={feature}>
-                        <CheckCircle2 size={18} />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <button className={plan.popular ? 'btn btn-primary btn-full' : 'btn btn-secondary btn-full'}>
-                    Subscribe via WhatsApp
-                  </button>
+                <Reveal delay={index * 150} key={plan.title} className="h-full">
+                  <motion.div 
+                    whileHover={{ y: -10, scale: 1.02 }}
+                    transition={{ type: "spring", bounce: 0.4 }}
+                    className={`pricing-card motion-card ${plan.popular ? 'popular' : ''}`}
+                    style={{ height: '100%' }}
+                  >
+                    {plan.popular && <div className="popular-badge">Best value</div>}
+                    <h3>{plan.title}</h3>
+                    <div className="price">
+                      {plan.price}
+                      <span>{plan.period}</span>
+                    </div>
+                    <ul className="pricing-features">
+                      {plan.features.map((feature) => (
+                        <li key={feature}>
+                          <CheckCircle2 size={18} />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <motion.button 
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className={plan.popular ? 'btn btn-primary btn-full' : 'btn btn-secondary btn-full'}
+                    >
+                      Subscribe via WhatsApp
+                    </motion.button>
+                  </motion.div>
                 </Reveal>
               ))}
             </div>
