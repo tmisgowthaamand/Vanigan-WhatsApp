@@ -2,13 +2,17 @@
 
 :root {
   --bg: #071112;
-  --bg-soft: #0e1d1f;
-  --surface: rgba(255, 255, 255, 0.075);
-  --surface-strong: rgba(255, 255, 255, 0.12);
-  --border: rgba(255, 255, 255, 0.14);
+  --bg-soft: #0c1819;
+  --section: #0a1415;
+  --section-contrast: #0d1b1d;
+  --card: #102224;
+  --card-strong: #13292b;
+  --surface: rgba(255, 255, 255, 0.08);
+  --surface-strong: rgba(255, 255, 255, 0.13);
+  --border: rgba(213, 251, 237, 0.15);
   --text: #f6fbfb;
-  --muted: #abc0bf;
-  --muted-strong: #d7e4e2;
+  --muted: #bdd1cf;
+  --muted-strong: #e3eeee;
   --primary: #18c47f;
   --primary-strong: #0aa96a;
   --primary-soft: rgba(24, 196, 127, 0.15);
@@ -32,8 +36,9 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    linear-gradient(120deg, rgba(24, 196, 127, 0.12), transparent 24%),
-    linear-gradient(300deg, rgba(113, 119, 246, 0.16), transparent 28%),
+    linear-gradient(180deg, #081415 0%, #071112 44%, #0a1415 100%),
+    linear-gradient(120deg, rgba(24, 196, 127, 0.1), transparent 28%),
+    linear-gradient(300deg, rgba(113, 119, 246, 0.11), transparent 30%),
     var(--bg);
   color: var(--text);
   font-family: var(--font);
@@ -80,10 +85,11 @@ a {
   inset: 0;
   z-index: -2;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 58px 58px;
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent 78%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 82%);
+  pointer-events: none;
 }
 
 .container {
@@ -105,7 +111,7 @@ a {
 .navbar.scrolled,
 .navbar:has(.nav-links.open) {
   padding: 12px 0;
-  background: rgba(7, 17, 18, 0.86);
+  background: rgba(7, 17, 18, 0.94);
   border-color: var(--border);
   backdrop-filter: blur(18px);
 }
@@ -151,7 +157,7 @@ a {
 }
 
 .nav-links a {
-  color: var(--muted);
+  color: #d8e8e6;
   font-size: 0.94rem;
   font-weight: 700;
   text-decoration: none;
@@ -274,6 +280,8 @@ a {
   font-size: clamp(3rem, 6.5vw, 6.35rem);
   line-height: 0.93;
   letter-spacing: 0;
+  text-wrap: balance;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.32);
 }
 
 .hero-copy {
@@ -556,7 +564,44 @@ a {
 }
 
 .section-band {
+  position: relative;
   padding: 96px 0;
+}
+
+.page-section {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0)),
+    var(--section);
+}
+
+.page-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(24, 196, 127, 0.08), transparent 24%, transparent 76%, rgba(113, 119, 246, 0.07)),
+    repeating-linear-gradient(90deg, transparent 0 119px, rgba(255, 255, 255, 0.03) 120px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.section-contrast {
+  background:
+    linear-gradient(180deg, rgba(24, 196, 127, 0.045), rgba(255, 255, 255, 0)),
+    var(--section-contrast);
+}
+
+.section-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(1180px, calc(100% - 40px));
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(213, 251, 237, 0.22), transparent);
 }
 
 .section-heading {
@@ -570,12 +615,15 @@ a {
   font-size: clamp(2rem, 4.5vw, 3.5rem);
   line-height: 1.05;
   letter-spacing: 0;
+  color: var(--text);
+  text-wrap: balance;
 }
 
 .section-heading p {
   margin: 0;
-  color: var(--muted);
-  font-size: 1rem;
+  color: var(--muted-strong);
+  font-size: 1.05rem;
+  font-weight: 600;
 }
 
 .features-grid {
@@ -588,21 +636,51 @@ a {
 .pricing-card,
 .timeline-item {
   border-radius: 8px;
-  background: var(--surface);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
+    var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
 }
 
 .feature-card {
+  position: relative;
   min-height: 260px;
   padding: 28px;
-  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+  overflow: hidden;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-6px);
-  background: var(--surface-strong);
-  border-color: rgba(24, 196, 127, 0.38);
+  transform: translateY(-7px);
+  background:
+    linear-gradient(180deg, rgba(24, 196, 127, 0.055), rgba(255, 255, 255, 0)),
+    var(--card-strong);
+  border-color: rgba(24, 196, 127, 0.52);
+  box-shadow: 0 24px 58px rgba(0, 0, 0, 0.34);
+}
+
+.motion-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%) skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: transform 650ms ease;
+  pointer-events: none;
+}
+
+.motion-card:hover::after {
+  transform: translateX(120%) skewX(-18deg);
+}
+
+.module-number {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  color: rgba(227, 238, 238, 0.28);
+  font-size: 0.86rem;
+  font-weight: 900;
 }
 
 .feature-icon,
@@ -611,9 +689,9 @@ a {
   width: 54px;
   height: 54px;
   place-items: center;
-  color: var(--primary);
-  background: var(--primary-soft);
-  border: 1px solid rgba(24, 196, 127, 0.24);
+  color: #65e8ad;
+  background: rgba(24, 196, 127, 0.13);
+  border: 1px solid rgba(24, 196, 127, 0.32);
   border-radius: 8px;
 }
 
@@ -621,7 +699,8 @@ a {
 .timeline-item h3,
 .pricing-card h3 {
   margin: 18px 0 8px;
-  font-size: 1.14rem;
+  color: var(--text);
+  font-size: 1.18rem;
   line-height: 1.25;
   letter-spacing: 0;
 }
@@ -629,11 +708,12 @@ a {
 .feature-card p,
 .timeline-item p {
   margin: 0;
-  color: var(--muted);
+  color: #d6e4e1;
+  font-weight: 600;
 }
 
 .workflow {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0));
+  background: transparent;
 }
 
 .workflow-grid {
@@ -660,10 +740,20 @@ a {
   gap: 18px;
   align-items: center;
   padding: 22px;
+  overflow: hidden;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.timeline-item:hover {
+  transform: translateX(6px);
+  background:
+    linear-gradient(90deg, rgba(24, 196, 127, 0.08), rgba(255, 255, 255, 0)),
+    var(--card-strong);
+  border-color: rgba(24, 196, 127, 0.42);
 }
 
 .timeline-item span {
-  color: var(--primary);
+  color: #5df0ac;
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -674,7 +764,7 @@ a {
 }
 
 .timeline-arrow {
-  color: var(--muted);
+  color: #d6e4e1;
 }
 
 .pricing-grid {
@@ -686,10 +776,20 @@ a {
 .pricing-card {
   position: relative;
   padding: 30px;
+  overflow: hidden;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(24, 196, 127, 0.42);
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.36);
 }
 
 .pricing-card.popular {
-  background: linear-gradient(180deg, rgba(24, 196, 127, 0.16), rgba(255, 255, 255, 0.075));
+  background:
+    linear-gradient(180deg, rgba(24, 196, 127, 0.2), rgba(255, 255, 255, 0.03)),
+    var(--card-strong);
   border-color: rgba(24, 196, 127, 0.52);
 }
 
@@ -713,11 +813,12 @@ a {
   font-size: clamp(2.35rem, 5vw, 3.2rem);
   font-weight: 900;
   line-height: 1;
+  color: var(--text);
 }
 
 .price span {
   padding-bottom: 6px;
-  color: var(--muted);
+  color: #d6e4e1;
   font-size: 0.92rem;
   font-weight: 800;
   text-transform: lowercase;
@@ -735,13 +836,13 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--muted-strong);
-  font-weight: 700;
+  color: #e3eeee;
+  font-weight: 750;
 }
 
 .pricing-features svg {
   flex: 0 0 auto;
-  color: var(--primary);
+  color: #5df0ac;
 }
 
 .btn-full {
@@ -759,8 +860,11 @@ a {
   gap: 24px;
   padding: 34px;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(24, 196, 127, 0.18), rgba(113, 119, 246, 0.14));
-  border: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgba(24, 196, 127, 0.24), rgba(113, 119, 246, 0.18)),
+    var(--card);
+  border: 1px solid rgba(24, 196, 127, 0.24);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 }
 
 .cta-inner > div {
@@ -778,12 +882,13 @@ a {
   margin: 0;
   font-size: clamp(1.4rem, 3vw, 2.2rem);
   line-height: 1.12;
+  color: var(--text);
 }
 
 .footer {
   padding: 34px 0;
   border-top: 1px solid var(--border);
-  background: rgba(5, 10, 11, 0.74);
+  background: #071112;
 }
 
 .footer-inner {
@@ -795,7 +900,7 @@ a {
 
 .footer p {
   margin: 0;
-  color: var(--muted);
+  color: #c4d8d5;
   font-size: 0.9rem;
 }
 

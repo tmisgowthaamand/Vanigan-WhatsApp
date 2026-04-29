@@ -122,11 +122,21 @@ function SectionHeading({ eyebrow, title, desc }) {
   );
 }
 
+function PageSection({ id, className = '', children }) {
+  return (
+    <section id={id} className={`page-section ${className}`}>
+      <div className="section-line" aria-hidden="true" />
+      {children}
+    </section>
+  );
+}
+
 function FeatureCard({ item, index }) {
   const Icon = item.icon;
 
   return (
-    <Reveal delay={index * 80} className="feature-card">
+    <Reveal delay={index * 80} className="feature-card motion-card">
+      <span className="module-number">0{index + 1}</span>
       <div className="feature-icon">
         <Icon size={26} />
       </div>
@@ -308,7 +318,7 @@ function Landing() {
           </div>
         </section>
 
-        <section id="features" className="features section-band">
+        <PageSection id="features" className="features section-band">
           <div className="container">
             <SectionHeading
               eyebrow="Product modules"
@@ -321,9 +331,9 @@ function Landing() {
               ))}
             </div>
           </div>
-        </section>
+        </PageSection>
 
-        <section id="workflow" className="workflow section-band">
+        <PageSection id="workflow" className="workflow section-band section-contrast">
           <div className="container workflow-grid">
             <div>
               <SectionHeading
@@ -336,7 +346,7 @@ function Landing() {
               {workflow.map((item, index) => {
                 const Icon = item.icon;
                 return (
-                  <Reveal delay={index * 100} className="timeline-item" key={item.title}>
+                  <Reveal delay={index * 100} className="timeline-item motion-card" key={item.title}>
                     <div className="timeline-icon">
                       <Icon size={22} />
                     </div>
@@ -351,9 +361,9 @@ function Landing() {
               })}
             </div>
           </div>
-        </section>
+        </PageSection>
 
-        <section id="pricing" className="pricing section-band">
+        <PageSection id="pricing" className="pricing section-band">
           <div className="container">
             <SectionHeading
               eyebrow="Subscription plans"
@@ -362,7 +372,7 @@ function Landing() {
             />
             <div className="pricing-grid">
               {pricing.map((plan, index) => (
-                <Reveal delay={index * 100} className={`pricing-card ${plan.popular ? 'popular' : ''}`} key={plan.title}>
+                <Reveal delay={index * 100} className={`pricing-card motion-card ${plan.popular ? 'popular' : ''}`} key={plan.title}>
                   {plan.popular && <div className="popular-badge">Best value</div>}
                   <h3>{plan.title}</h3>
                   <div className="price">
@@ -384,7 +394,7 @@ function Landing() {
               ))}
             </div>
           </div>
-        </section>
+        </PageSection>
 
         <section className="cta-strip">
           <div className="container cta-inner">
