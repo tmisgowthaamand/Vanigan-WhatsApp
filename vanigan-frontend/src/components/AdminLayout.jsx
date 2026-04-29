@@ -52,7 +52,7 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside style={{ ...s.sidebar, ...(isMobile && !open ? s.sidebarHidden : {}) }}>
         <div style={s.logo}>
-          <Bot size={28} color="#6366f1" />
+          <img src="https://vanigan.digital/vaniganlogo.png" alt="Vanigan Logo" style={{ width: 28, height: 28, objectFit: 'contain' }} />
           <span>Vanigan <span style={{ color: '#6366f1' }}>Admin</span></span>
           {isMobile && <button onClick={() => setOpen(false)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}><X size={20} /></button>}
         </div>
