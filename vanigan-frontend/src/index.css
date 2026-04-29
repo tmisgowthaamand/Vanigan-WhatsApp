@@ -144,6 +144,7 @@ a {
   color: var(--primary);
   background: rgba(24, 196, 127, 0.12);
   border: 1px solid rgba(24, 196, 127, 0.28);
+  animation: brandFloat 4s ease-in-out infinite;
 }
 
 .brand-accent {
@@ -217,15 +218,29 @@ a {
 }
 
 .nav-cta {
+  position: relative;
+  overflow: hidden;
   min-height: 40px;
   padding-inline: 16px;
 }
 
+.nav-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-125%) skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+  animation: navCtaShine 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
 .hero {
   position: relative;
+  isolation: isolate;
   min-height: 100vh;
   display: flex;
   align-items: center;
+  overflow: hidden;
   padding: 112px 0 72px;
 }
 
@@ -240,10 +255,146 @@ a {
 }
 
 .hero-grid {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1.04fr) minmax(330px, 0.86fr);
   gap: 56px;
   align-items: center;
+}
+
+.hero-motion {
+  position: absolute;
+  inset: 74px 0 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.motion-orbit {
+  position: absolute;
+  border: 1px solid rgba(103, 232, 173, 0.24);
+  border-radius: 50%;
+  opacity: 0.75;
+}
+
+.motion-orbit::before,
+.motion-orbit::after {
+  content: '';
+  position: absolute;
+  inset: 18%;
+  border: 1px solid rgba(113, 119, 246, 0.14);
+  border-radius: 50%;
+}
+
+.motion-orbit::after {
+  inset: 34%;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.motion-orbit span {
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #60e8aa;
+  box-shadow: 0 0 22px rgba(96, 232, 170, 0.74);
+}
+
+.orbit-one {
+  width: 330px;
+  height: 330px;
+  top: 74px;
+  right: 13%;
+  animation: orbitDrift 18s linear infinite;
+}
+
+.orbit-two {
+  width: 230px;
+  height: 230px;
+  right: 2%;
+  bottom: 72px;
+  animation: orbitDriftReverse 16s linear infinite;
+}
+
+.motion-beam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(24, 196, 127, 0.12), transparent);
+  filter: blur(2px);
+  animation: beamSweep 9s ease-in-out infinite;
+}
+
+.motion-node {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #7af4be;
+  box-shadow: 0 0 24px rgba(122, 244, 190, 0.74);
+  animation: nodeFloat 7s ease-in-out infinite;
+}
+
+.node-one {
+  top: 22%;
+  left: 14%;
+}
+
+.node-two {
+  top: 54%;
+  left: 6%;
+  animation-delay: 900ms;
+}
+
+.node-three {
+  right: 18%;
+  bottom: 18%;
+  animation-delay: 1700ms;
+}
+
+.motion-chip {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 12px;
+  color: #eafff7;
+  border-radius: 8px;
+  background: rgba(12, 28, 29, 0.72);
+  border: 1px solid rgba(122, 244, 190, 0.22);
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.motion-chip svg {
+  color: #60e8aa;
+}
+
+.chip-business {
+  top: 20%;
+  left: 51%;
+  animation: chipDriftOne 8s ease-in-out infinite;
+}
+
+.chip-message {
+  top: 43%;
+  right: 6%;
+  animation: chipDriftTwo 9s ease-in-out infinite;
+}
+
+.chip-map {
+  left: 42%;
+  bottom: 20%;
+  animation: chipDriftThree 7.5s ease-in-out infinite;
 }
 
 .hero-content {
@@ -936,6 +1087,111 @@ a {
   }
 }
 
+@keyframes brandFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 rgba(24, 196, 127, 0);
+  }
+  50% {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(24, 196, 127, 0.18);
+  }
+}
+
+@keyframes navCtaShine {
+  0%,
+  45% {
+    transform: translateX(-125%) skewX(-18deg);
+  }
+  72%,
+  100% {
+    transform: translateX(125%) skewX(-18deg);
+  }
+}
+
+@keyframes orbitDrift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(-18px, 14px, 0) rotate(180deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(360deg);
+  }
+}
+
+@keyframes orbitDriftReverse {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(360deg);
+  }
+  50% {
+    transform: translate3d(14px, -18px, 0) rotate(180deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes beamSweep {
+  0%,
+  100% {
+    left: -24%;
+    opacity: 0;
+  }
+  20%,
+  70% {
+    opacity: 1;
+  }
+  86% {
+    left: 108%;
+    opacity: 0;
+  }
+}
+
+@keyframes nodeFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.42;
+  }
+  50% {
+    transform: translate3d(16px, -18px, 0) scale(1.22);
+    opacity: 1;
+  }
+}
+
+@keyframes chipDriftOne {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(18px, -14px, 0);
+  }
+}
+
+@keyframes chipDriftTwo {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-20px, 16px, 0);
+  }
+}
+
+@keyframes chipDriftThree {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(14px, 18px, 0);
+  }
+}
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(24, 196, 127, 0.7);
@@ -1046,6 +1302,22 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .chip-business,
+  .chip-message,
+  .chip-map {
+    display: none;
+  }
+
+  .orbit-one {
+    right: -88px;
+  }
+
+  .orbit-two {
+    left: -90px;
+    right: auto;
+    bottom: 40px;
+  }
+
   .hero-content,
   .section-heading,
   .workflow .section-heading {
@@ -1099,6 +1371,15 @@ a {
 
   .signal-card {
     display: none;
+  }
+
+  .hero-motion {
+    top: 62px;
+    opacity: 0.75;
+  }
+
+  .motion-orbit {
+    transform: scale(0.75);
   }
 
   .section-band {

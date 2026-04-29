@@ -129,6 +129,35 @@ function PageSection({ id, className = '', children }) {
   );
 }
 
+function HeroMotion() {
+  return (
+    <div className="hero-motion" aria-hidden="true">
+      <div className="motion-orbit orbit-one">
+        <span />
+      </div>
+      <div className="motion-orbit orbit-two">
+        <span />
+      </div>
+      <div className="motion-beam" />
+      <div className="motion-node node-one" />
+      <div className="motion-node node-two" />
+      <div className="motion-node node-three" />
+      <div className="motion-chip chip-business">
+        <BriefcaseBusiness size={15} />
+        Verified listing
+      </div>
+      <div className="motion-chip chip-message">
+        <MessageCircle size={15} />
+        WhatsApp lead
+      </div>
+      <div className="motion-chip chip-map">
+        <MapPin size={15} />
+        District match
+      </div>
+    </div>
+  );
+}
+
 function FeatureCard({ item, index }) {
   const Icon = item.icon;
 
@@ -263,6 +292,7 @@ function Landing() {
       <main>
         <section className="hero">
           <div className="hero-backdrop" />
+          <HeroMotion />
           <div className="container hero-grid">
             <div className="hero-content">
               <Reveal>
