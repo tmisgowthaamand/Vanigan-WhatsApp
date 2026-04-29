@@ -3,8 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { API, setToken } from '../config';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(() => {
+    const saved = localStorage.getItem('remember_me');
+    if (saved === 'true') return localStorage.getItem('saved_username') || '';
+    return '';
+  });
+  const [password, setPassword] = useState(() => {
+    const saved = localStorage.getItem('remember_me');
+    if (saved === 'true') return localStorage.getItem('saved_password') || '';
+    return '';
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -83,7 +91,17 @@ export default function Login() {
             Show password
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: '#94a3b8', fontSize: '0.8rem' }}>
-            <input type="checkbox" checked={rememberMe} onChange={(e) => { setRememberMe(e.target.checked); localStorage.setItem('remember_me', String(e.target.checked)); }} style={{ accentColor: '#6366f1', cursor: 'pointer' }} />
+            <input type="checkbox" checked={rememberMe} onChange={(e) => { 
+              setRememberMe(e.target.checked); 
+              localStorage.setItem('remember_me', String(e.target.checked));
+              if (e.target.checked) {
+                localStorage.setItem('saved_username', username);
+                localStorage.setItem('saved_password', password);
+              } else {
+                localStorage.removeItem('saved_username');
+                localStorage.removeItem('saved_password');
+              }
+            }} style={{ accentColor: '#6366f1', cursor: 'pointer' }} />
             Remember me
           </label>
         </div>
