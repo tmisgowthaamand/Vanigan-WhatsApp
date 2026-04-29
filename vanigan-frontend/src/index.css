@@ -904,6 +904,24 @@ a {
   font-size: 0.9rem;
 }
 
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.footer-links a {
+  color: #d8e8e6;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary);
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(18px);
@@ -1100,6 +1118,10 @@ a {
   .footer-inner {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
   }
 
   .cta-inner .btn {

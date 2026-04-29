@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   ChevronRight,
   Image as ImageIcon,
-  LayoutDashboard,
   MapPin,
   Menu,
   MessageCircle,
@@ -15,7 +14,6 @@ import {
   PhoneCall,
   Send,
   ShieldCheck,
-  Smartphone,
   Sparkles,
   Users,
   X,
@@ -244,7 +242,6 @@ function Landing() {
             <a href="#features" onClick={closeMenu}>Features</a>
             <a href="#workflow" onClick={closeMenu}>How it works</a>
             <a href="#pricing" onClick={closeMenu}>Pricing</a>
-            <Link to="/admin" onClick={closeMenu}>Admin Panel</Link>
             <button className="btn btn-primary nav-cta" onClick={() => window.open(whatsappUrl, '_blank', 'noopener,noreferrer')}>
               <MessageCircle size={18} />
               Connect
@@ -293,10 +290,6 @@ function Landing() {
                     Try WhatsApp demo
                     <ArrowRight size={18} />
                   </button>
-                  <Link to="/admin" className="btn btn-secondary">
-                    <LayoutDashboard size={18} />
-                    Admin Panel
-                  </Link>
                 </div>
               </Reveal>
 
@@ -420,6 +413,11 @@ function Landing() {
             <span className="brand-accent">App</span>
           </Link>
           <p>Copyright 2026 Vanigan Network. All rights reserved.</p>
+          <div className="footer-links">
+            <a href="#features">Features</a>
+            <a href="#workflow">How it works</a>
+            <a href="#pricing">Pricing</a>
+          </div>
         </div>
       </footer>
     </div>
