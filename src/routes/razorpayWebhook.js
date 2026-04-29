@@ -244,4 +244,87 @@ router.get('/callback', async (req, res) => {
   `);
 });
 
+// Test mode: Simulate successful payment (only works with test keys)
+router.post('/test-pay/:paymentLinkId', async (req, res) => {
+  try {
+    // Only allow in test mode
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_ID.startsWith('rzp_test_')) {
+      return res.status(403).json({ error: 'Test payment only available in test mode' });
+    }
+
+    const { paymentLinkId } = req.params;
+
+    // Find the payment record
+    const payment = await Payment.findOne({
+      $or: [
+        { razorpayOrderId: paymentLinkId },
+        { razorpayPaymentLinkId: paymentLinkId }
+      ]
+    });
+
+    if (!payment) {
+      return res.status(404).json({ error: 'Payment not found' });
+    }
+
+    if (payment.status === 'paid') {
+      return res.status(400).json({ error: 'Payment already completed' });
+    }
+
+    const whatsappNumber = payment.whatsappNumber;
+    const plan = payment.plan;
+
+    // Mark payment as paid
+    payment.status = 'paid';
+    payment.razorpayPaymentId = `test_pay_${Date.now()}`;
+    await payment.save();
+
+    // Update user subscription
+    const user = await User.findOne({ whatsappNumber });
+    if (user) {
+      const now = new Date();
+      let endDate = new Date();
+
+      if (plan === 'monthly') {
+        endDate.setMonth(endDate.getMonth() + 1);
+      } else if (plan === 'yearly') {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      } else if (plan === 'lifetime') {
+        endDate.setFullYear(endDate.getFullYear() + 100);
+      }
+
+      user.subscription = {
+        plan,
+        status: 'active',
+        razorpayOrderId: paymentLinkId,
+        razorpayPaymentId: payment.razorpayPaymentId,
+        startDate: now,
+        endDate: endDate
+      };
+      user.currentState = 'choose_service';
+      user.tempData = {};
+      await user.save();
+
+      // Send WhatsApp confirmation
+      const lang = user.language === 'ta' ? ta : en;
+      const planNames = { monthly: 'Monthly', yearly: 'Yearly', lifetime: 'Lifetime' };
+      const msg = lang.paymentSuccess
+        .replace('{plan}', planNames[plan] || plan)
+        .replace('{amount}', payment.amount)
+        .replace('{paymentId}', payment.razorpayPaymentId)
+        .replace('{startDate}', now.toLocaleDateString('en-IN'))
+        .replace('{endDate}', endDate.toLocaleDateString('en-IN'));
+
+      await wa.sendText(whatsappNumber, msg);
+      await trackAction(whatsappNumber, 'choose_service', 'test_payment_success', '', {
+        plan, amount: payment.amount, paymentId: payment.razorpayPaymentId
+      });
+    }
+
+    return res.json({ success: true, message: 'Test payment completed successfully', plan, whatsappNumber });
+  } catch (err) {
+    console.error('Test payment error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Trash2, CheckCircle } from 'lucide-react';
 import { API } from '../config';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://vanigan-whatsapp-n2c1.onrender.com';
 const table = { width: '100%', borderCollapse: 'collapse' };
 const th = { textAlign: 'left', padding: '12px 16px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.05em' };
 const td = { padding: '12px 16px', borderBottom: '1px solid #1e293b', fontSize: '0.9rem', color: '#e2e8f0' };
@@ -40,6 +41,23 @@ export default function Payments() {
     showToast('Deleted successfully');
   };
 
+  const markAsPaid = async (payment) => {
+    try {
+      const linkId = payment.razorpayPaymentLinkId || payment.razorpayOrderId;
+      if (!linkId) { showToast('No payment link ID found'); return; }
+      const res = await fetch(`${API_BASE}/razorpay/test-pay/${linkId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      const data = await res.json();
+      if (data.success) {
+        fetchPayments();
+        showToast('Payment marked as paid! WhatsApp confirmation sent.');
+      } else {
+        showToast(data.error || 'Failed to mark as paid');
+      }
+    } catch (err) {
+      showToast('Error: ' + err.message);
+    }
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
@@ -72,7 +90,12 @@ export default function Payments() {
                 <td style={td}><span style={statusBadge(p.status)}>{p.status === 'created' ? 'Pending' : p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></td>
                 <td style={{ ...td, fontSize: '0.8rem', color: '#64748b' }}>{p.razorpayPaymentId || p.razorpayOrderId || '-'}</td>
                 <td style={td}>{new Date(p.createdAt).toLocaleString('en-IN')}</td>
-                <td style={td}>
+                <td style={{ ...td, display: 'flex', gap: 6 }}>
+                  {p.status === 'created' && (
+                    <button onClick={() => markAsPaid(p)} title="Mark as Paid (Test)" style={{ background: '#22c55e20', border: 'none', color: '#22c55e', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', fontWeight: 500 }}>
+                      <CheckCircle size={14} /> Pay
+                    </button>
+                  )}
                   <button onClick={() => deletePayment(p._id)} title="Delete" style={{ background: '#ef444420', border: 'none', color: '#ef4444', padding: '4px 6px', borderRadius: 6, cursor: 'pointer' }}>
                     <Trash2 size={16} />
                   </button>
