@@ -8,7 +8,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(!!localStorage.getItem('admin_token'));
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
