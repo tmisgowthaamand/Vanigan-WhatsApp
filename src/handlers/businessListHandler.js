@@ -4,6 +4,49 @@ const wa = require('../services/whatsapp');
 const { trackAction } = require('../services/leadTracker');
 
 const PAGE_SIZE = 5;
+const PAGES_PER_LIST_VIEW = 8;
+
+async function sendPageNavigationList(num, currentPage, totalPages, pageListView) {
+  if (totalPages <= 1) {
+    await wa.sendButtons(num, 'Navigate:', [
+      { id: '0', title: 'Back' },
+      { id: '9', title: 'Main Menu' }
+    ]);
+    return;
+  }
+
+  const view = pageListView || Math.ceil(currentPage / PAGES_PER_LIST_VIEW);
+  const startPage = (view - 1) * PAGES_PER_LIST_VIEW + 1;
+  const endPage = Math.min(startPage + PAGES_PER_LIST_VIEW - 1, totalPages);
+  const hasNextView = endPage < totalPages;
+  const hasPrevView = view > 1;
+
+  const rows = [];
+
+  if (hasPrevView) {
+    rows.push({ id: `pagelist_${view - 1}`, title: '⬅️ Previous Pages' });
+  }
+
+  for (let p = startPage; p <= endPage; p++) {
+    rows.push({
+      id: `page_${p}`,
+      title: p === currentPage ? `📍 Page ${p} (Current)` : `Page ${p}`
+    });
+  }
+
+  if (hasNextView) {
+    rows.push({ id: `pagelist_${view + 1}`, title: 'Next Pages ➡️' });
+  }
+
+  const sections = [{ title: `Pages ${startPage}-${endPage} of ${totalPages}`, rows }];
+
+  await wa.sendList(num, 'Business Directory', `Page ${currentPage} of ${totalPages}`, 'Select Page', sections);
+
+  await wa.sendButtons(num, 'Navigate:', [
+    { id: '0', title: 'Back' },
+    { id: '9', title: 'Main Menu' }
+  ]);
+}
 
 async function handleBusinessList(user, text, lang) {
   const t = lang;
@@ -21,7 +64,15 @@ async function handleBusinessList(user, text, lang) {
       const totalForNav = await Business.countDocuments(query);
       const totalPagesForNav = Math.ceil(totalForNav / PAGE_SIZE) || 1;
 
-      // Handle page navigation commands (button replies like "page_2", "page_3", etc.)
+      // Handle page list navigation (browsing page numbers in the list)
+      const pageListMatch = text.match(/^pagelist_(\d+)$/);
+      if (pageListMatch) {
+        const listView = parseInt(pageListMatch[1]);
+        await sendPageNavigationList(num, user.tempData.page || 1, totalPagesForNav, listView);
+        return;
+      }
+
+      // Handle page navigation commands (list replies like "page_2", "page_3", etc.)
       const pageMatch = text.match(/^page_(\d+)$/);
       if (pageMatch) {
         const requestedPage = parseInt(pageMatch[1]);
@@ -73,18 +124,8 @@ async function handleBusinessList(user, text, lang) {
       await user.save();
       await wa.sendText(num, msg);
 
-      // Send navigation buttons (WhatsApp allows max 3 buttons)
-      // Always include Main Menu button + up to 2 page buttons
-      const navButtons = [];
-      if (totalPages > 1) {
-        for (let p = 1; p <= totalPages && navButtons.length < 2; p++) {
-          if (p !== currentPage) {
-            navButtons.push({ id: `page_${p}`, title: `Page ${p}` });
-          }
-        }
-      }
-      navButtons.push({ id: '9', title: 'Main Menu' });
-      await wa.sendButtons(num, `Page ${currentPage} of ${totalPages}`, navButtons);
+      // Send interactive page selection list (like organizer district list)
+      await sendPageNavigationList(num, currentPage, totalPages);
 
       await trackAction(num, 'business_list', 'view_list', text, { page: currentPage });
       break;
@@ -154,15 +195,8 @@ async function startBusinessListFlow(user, lang) {
 
   await wa.sendText(user.whatsappNumber, msg);
 
-  // Send navigation buttons - always include Main Menu + up to 2 page buttons
-  const navButtons = [];
-  if (totalPages > 1) {
-    for (let p = 2; p <= totalPages && navButtons.length < 2; p++) {
-      navButtons.push({ id: `page_${p}`, title: `Page ${p}` });
-    }
-  }
-  navButtons.push({ id: '9', title: 'Main Menu' });
-  await wa.sendButtons(user.whatsappNumber, `Page 1 of ${totalPages}`, navButtons);
+  // Send interactive page selection list (like organizer district list)
+  await sendPageNavigationList(user.whatsappNumber, 1, totalPages);
 
   await trackAction(user.whatsappNumber, 'business_list', 'started', '', {});
 }
