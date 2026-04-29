@@ -71,12 +71,12 @@ a {
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .site-shell {
   position: relative;
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
 }
 
