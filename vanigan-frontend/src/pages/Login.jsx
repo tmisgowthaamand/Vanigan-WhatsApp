@@ -8,7 +8,10 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(localStorage.getItem('remember_me') === 'true');
+  const [rememberMe, setRememberMe] = useState(() => {
+    const saved = localStorage.getItem('remember_me');
+    return saved === 'true';
+  });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -80,7 +83,7 @@ export default function Login() {
             Show password
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: '#94a3b8', fontSize: '0.8rem' }}>
-            <input type="checkbox" checked={rememberMe} onChange={(e) => { setRememberMe(e.target.checked); localStorage.setItem('remember_me', e.target.checked); }} style={{ accentColor: '#6366f1', cursor: 'pointer' }} />
+            <input type="checkbox" checked={rememberMe} onChange={(e) => { setRememberMe(e.target.checked); localStorage.setItem('remember_me', String(e.target.checked)); }} style={{ accentColor: '#6366f1', cursor: 'pointer' }} />
             Remember me
           </label>
         </div>
