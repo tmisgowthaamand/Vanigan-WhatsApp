@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="https://vanigan.digital/vaniganlogo.png" id="dynamic-favicon" />
+    <link rel="icon" type="image/png" href="/vaniganlogo.png" id="dynamic-favicon" />
+    <link rel="apple-touch-icon" href="/vaniganlogo.png" />
+    <meta property="og:image" content="/vaniganlogo.png" />
     <script>
       (function() {
         const img = new Image();
@@ -19,7 +21,7 @@
           const link = document.getElementById('dynamic-favicon');
           if (link) link.href = canvas.toDataURL('image/png');
         };
-        img.src = 'https://vanigan.digital/vaniganlogo.png';
+        img.src = '/vaniganlogo.png';
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
