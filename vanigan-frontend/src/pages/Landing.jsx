@@ -515,22 +515,27 @@ function Landing() {
           </div>
         </PageSection>
 
-        <section className="cta-strip">
-          <div className="container cta-inner">
+        <PageSection id="cta-strip" className="cta-strip">
+          <Reveal className="container cta-inner">
             <div>
               <BadgeCheck size={28} />
               <h2>Ready to make Vanigan searchable from every phone?</h2>
             </div>
-            <button className="btn btn-primary" onClick={() => window.open(whatsappUrl, '_blank', 'noopener,noreferrer')}>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn btn-primary" 
+              onClick={() => window.open(whatsappUrl, '_blank', 'noopener,noreferrer')}
+            >
               Launch chat
               <ArrowRight size={18} />
-            </button>
-          </div>
-        </section>
+            </motion.button>
+          </Reveal>
+        </PageSection>
       </main>
 
       <footer className="footer">
-        <div className="container footer-inner">
+        <Reveal className="container footer-inner">
           <Link to="/" className="brand">
             <span className="brand-mark">
               <Bot size={20} />
@@ -544,7 +549,7 @@ function Landing() {
             <a href="#workflow">How it works</a>
             <a href="#pricing">Pricing</a>
           </div>
-        </div>
+        </Reveal>
       </footer>
     </div>
   );
